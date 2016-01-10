@@ -16,6 +16,11 @@
 
 	<dependencies>
 
+	<dependency>
+		<groupId>org.matt.budget</groupId>
+		<artifactId>models</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
 	</dependencies>
 	<build>
 		<finalName>server</finalName>
