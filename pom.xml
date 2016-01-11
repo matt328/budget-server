@@ -26,6 +26,7 @@
   <modules>
     <module>rest</module>
     <module>models</module>
+    <module>persistence</module>
   </modules>
   <dependencyManagement>
     <dependencies>
