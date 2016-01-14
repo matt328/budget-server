@@ -22,25 +22,23 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
 	<dependency>
-		<groupId>org.matt.budget</groupId>
-		<artifactId>persistence</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</dependency>
-	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
 	</dependency>
 	<dependency>
-		<groupId>ch.qos.logback</groupId>
-		<artifactId>logback-classic</artifactId>
+		<groupId>org.matt.budget</groupId>
+		<artifactId>rest-common</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
 	<dependency>
-		<groupId>ch.qos.logback</groupId>
-		<artifactId>logback-core</artifactId>
+		<groupId>javax</groupId>
+		<artifactId>javaee-api</artifactId>
+		<scope>provided</scope>
 	</dependency>
 	<dependency>
-		<groupId>org.tuxdude.logback.extensions</groupId>
-		<artifactId>logback-colorizer</artifactId>
+		<groupId>org.matt.budget</groupId>
+		<artifactId>service</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
 	</dependencies>
 	<build>

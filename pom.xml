@@ -27,6 +27,8 @@
     <module>rest</module>
     <module>models</module>
     <module>persistence</module>
+    <module>rest-common</module>
+    <module>service</module>
   </modules>
   <dependencyManagement>
     <dependencies>

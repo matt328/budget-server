@@ -1,4 +1,4 @@
-package org.matt.budget.persistence;
+package org.matt.budget.service;
 
 import javax.ejb.Stateless;
 

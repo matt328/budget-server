@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.matt.budget.models.Account;
-import org.matt.budget.persistence.AccountService;
 import org.matt.budget.persistence.Repository;
+import org.matt.budget.service.AccountService;
 
 import lombok.extern.slf4j.Slf4j;
 
