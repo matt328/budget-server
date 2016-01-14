@@ -51,12 +51,12 @@ public class Repository<T extends BaseEntity> implements Serializable {
 			try {
 				entityClass = resolveEntity(ip);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("provide entity class at injection point eg: @Inject Crud<Entity> crud");
+				throw new IllegalArgumentException("provide entity class at injection point eg: @Inject Repository<Entity> repo");
 			}
 
 		} else {
 			throw new IllegalArgumentException(
-					"Provide entity at injection point ex: @Inject Crud<Entity> crud");
+					"Provide entity at injection point ex: @Inject Repository<Entity> repo");
 		}
 	}
 
