@@ -5,71 +5,81 @@ import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.matt.budget.models.Account;
+import org.matt.budget.models.Workspace;
 import org.matt.budget.rest.common.AccountResource;
-import org.matt.budget.service.AccountService;
+import org.matt.budget.rest.common.WorkspaceResource;
+import org.matt.budget.service.WorkspaceService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequestScoped
-public class AccountEndpoint implements AccountResource {
+@Path("/workspaces")
+public class WorkspaceEndpoint implements WorkspaceResource {
 
-	@PathParam("workspaceId")
-	private Integer workspaceId;
+	@Context
+	ResourceContext rc;
 
 	@Inject
-	AccountService accountService;
+	WorkspaceService workspaceService;
 
 	@Override
-	public Response create(Account entity) {
-		accountService.insert(entity);
+	public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId) {
+		return rc.getResource(AccountEndpoint.class);
+	}
+
+	@Override
+	public Response create(Workspace entity) {
+		workspaceService.insert(entity);
+		System.out.println("Creating workspace");
+		log.debug("Creating Workspace: {}", entity);
 		return Response	.created(UriBuilder
-																			.fromResource(AccountEndpoint.class)
+																			.fromResource(WorkspaceEndpoint.class)
 																			.path(String.valueOf(entity.getId()))
 																			.build())
 										.build();
 	}
 
 	@Override
-	public Response deleteById(Integer id) {
+	public Response deleteById(@PathParam("workspaceId") Integer workspaceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Response findById(Integer id) {
+	public Response findById(@PathParam("workspaceId") Integer workspaceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Response list() {
-		log.debug("listing all accounts for Workspace {}", workspaceId);
-		List<Account> accounts = accountService.list();
-		return Response	.ok(accounts, MediaType.APPLICATION_JSON)
+		List<Workspace> workspaces = workspaceService.list();
+		return Response	.ok(workspaces)
 										.build();
 	}
 
 	@Override
-	public Response update(Integer id, Account entity) {
+	public Response update(@PathParam("workspaceId") Integer workspaceId, Workspace entity) {
 		if (entity == null) {
 			return Response	.status(Status.BAD_REQUEST)
 											.build();
 		}
-		if (!id.equals(entity.getId())) {
+		if (!workspaceId.equals(entity.getId())) {
 			return Response	.status(Status.CONFLICT)
 											.entity(entity)
 											.build();
 		}
 		try {
-			accountService.update(entity);
+			workspaceService.update(entity);
 		} catch (OptimisticLockException e) {
 			return Response	.status(Status.CONFLICT)
 											.entity(e.getEntity())
@@ -77,14 +87,6 @@ public class AccountEndpoint implements AccountResource {
 		}
 		return Response	.noContent()
 										.build();
-	}
-
-	public Integer getWorkspaceId() {
-		return workspaceId;
-	}
-
-	public void setWorkspaceId(Integer workspaceId) {
-		this.workspaceId = workspaceId;
 	}
 
 }
