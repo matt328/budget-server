@@ -26,14 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkspaceEndpoint implements WorkspaceResource {
 
 	@Context
-	ResourceContext rc;
+	ResourceContext resourceContext;
 
 	@Inject
 	WorkspaceService workspaceService;
 
 	@Override
 	public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId) {
-		return rc.getResource(AccountEndpoint.class);
+		return resourceContext.getResource(AccountEndpoint.class);
 	}
 
 	@Override
@@ -41,8 +41,7 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 		workspaceService.insert(entity);
 		System.out.println("Creating workspace");
 		log.debug("Creating Workspace: {}", entity);
-		return Response	.created(UriBuilder
-																			.fromResource(WorkspaceEndpoint.class)
+		return Response	.created(UriBuilder.fromResource(WorkspaceEndpoint.class)
 																			.path(String.valueOf(entity.getId()))
 																			.build())
 										.build();
@@ -63,15 +62,13 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 	@Override
 	public Response list() {
 		List<Workspace> workspaces = workspaceService.list();
-		return Response	.ok(workspaces)
-										.build();
+		return Response.ok(workspaces).build();
 	}
 
 	@Override
 	public Response update(@PathParam("workspaceId") Integer workspaceId, Workspace entity) {
 		if (entity == null) {
-			return Response	.status(Status.BAD_REQUEST)
-											.build();
+			return Response.status(Status.BAD_REQUEST).build();
 		}
 		if (!workspaceId.equals(entity.getId())) {
 			return Response	.status(Status.CONFLICT)
@@ -85,8 +82,7 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 											.entity(e.getEntity())
 											.build();
 		}
-		return Response	.noContent()
-										.build();
+		return Response.noContent().build();
 	}
 
 }

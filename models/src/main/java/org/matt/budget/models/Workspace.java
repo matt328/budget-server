@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import lombok.Data;
 
@@ -30,7 +31,15 @@ public class Workspace implements BaseEntity {
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
-	@XmlElement
 	private List<Account> accounts;
+
+	@XmlTransient
+	public List<Account> getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(List<Account> accounts) {
+		this.accounts = accounts;
+	}
 
 }
