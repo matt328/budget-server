@@ -8,7 +8,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.matt.budget.models.BaseEntity;
+import org.matt.budget.persistence.BaseEntity;
 import org.matt.budget.persistence.Repository;
 import org.matt.budget.service.exception.InvalidDataException;
 
@@ -20,11 +20,15 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 	@Inject
 	private Repository<T> repo;
 
+	public T findById(Serializable id) {
+		return repo.find(id);
+	}
+	
 	public List<T> list() {
 		return repo.findAll();
 	}
 
-	public void insert(T entity) {
+	public T insert(T entity) {
 		if (entity == null) {
 			throw new InvalidDataException("Entity cannot be null");
 		}
@@ -34,8 +38,10 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 		}
 
 		beforeInsert(entity);
-		repo.save(entity);
+		T created = repo.save(entity);
 		afterInsert(entity);
+		
+		return created;
 	}
 
 	public void update(T entity) {

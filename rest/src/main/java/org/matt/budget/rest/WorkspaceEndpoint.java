@@ -4,14 +4,21 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Link;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.matt.budget.models.Workspace;
 import org.matt.budget.rest.common.AccountResource;
@@ -26,6 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkspaceEndpoint implements WorkspaceResource {
 
 	@Context
+	UriInfo uriInfo;
+
+	@Context
 	ResourceContext resourceContext;
 
 	@Inject
@@ -38,12 +48,15 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 
 	@Override
 	public Response create(Workspace entity) {
-		workspaceService.insert(entity);
-		System.out.println("Creating workspace");
-		log.debug("Creating Workspace: {}", entity);
-		return Response	.created(UriBuilder.fromResource(WorkspaceEndpoint.class)
-																			.path(String.valueOf(entity.getId()))
+		Workspace created = workspaceService.insert(entity);
+
+		return Response	.created(UriBuilder.fromResource(WorkspaceResource.class)
+																			.path(WorkspaceResource.class)
+																			.path(Integer.toString(created.getId()))
 																			.build())
+										.entity(created)
+										.header("ETag", created.hashCode())
+										.links(new Link[] { getSelfLink(created.getId()), getAccountsLink(created.getId()) })
 										.build();
 	}
 
@@ -54,9 +67,33 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 	}
 
 	@Override
-	public Response findById(@PathParam("workspaceId") Integer workspaceId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response findById(@PathParam("workspaceId") Integer workspaceId, @Context Request request, @Context HttpHeaders headers) {
+		Workspace entity;
+
+		try {
+			entity = workspaceService.findById(workspaceId);
+		} catch (NoResultException ex) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+		CacheControl cc = new CacheControl();
+		cc.setMaxAge(100);
+
+		EntityTag tag = new EntityTag(Integer.toString(entity.hashCode()));
+
+		Response.ResponseBuilder builder = request.evaluatePreconditions(tag);
+
+		if (builder != null) {
+			return builder.cacheControl(cc)
+										.build();
+		}
+		builder = Response.ok(entity)
+											.cacheControl(cc)
+											.links(new Link[] { getSelfLink(entity.getId()), getAccountsLink(entity.getId()) })
+											.tag(tag);
+
+		return builder.build();
+
 	}
 
 	@Override
@@ -85,4 +122,22 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 		return Response.noContent().build();
 	}
 
+	private Link getSelfLink(Integer workspaceId) {
+		return Link	.fromUri(uriInfo.getBaseUriBuilder()
+																.path(WorkspaceResource.class)
+																.path(WorkspaceResource.class, "findById")
+																.build(Integer.toString(workspaceId)))
+								.rel("self")
+								.build();
+	}
+
+	private Link getAccountsLink(Integer workspaceId) {
+		return Link	.fromUri(uriInfo.getBaseUriBuilder()
+																.path(WorkspaceResource.class)
+																.path(WorkspaceResource.class, "listAccounts")
+																.build(Integer.toString(workspaceId)))
+								.rel("accounts")
+								.build(Integer.toString(workspaceId));
+
+	}
 }

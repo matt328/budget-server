@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.matt.budget.persistence.BaseEntity;
+
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package org.matt.budget.models;
+package org.matt.budget.persistence;
 
 import java.io.Serializable;
 

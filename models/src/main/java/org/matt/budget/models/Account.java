@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.matt.budget.models.enums.AccountType;
+import org.matt.budget.persistence.BaseEntity;
 
 import lombok.Builder;
 import lombok.Data;

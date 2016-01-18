@@ -14,9 +14,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.matt.budget.models.BaseEntity;
-
-public class Repository<T extends BaseEntity> implements Serializable {
+public class Repository<T> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,16 +26,16 @@ public class Repository<T extends BaseEntity> implements Serializable {
 	public List<T> findAll() {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<T> cq = cb.createQuery(entityClass);
-		
+
 		Root<T> root = cq.from(entityClass);
 		cq.select(root);
-		
+
 		TypedQuery<T> q = entityManager.createQuery(cq);
 		List<T> allT = q.getResultList();
 		return allT;
 	}
 
-	public T find(Serializable id, Class<T> entityClass) {
+	public T find(Serializable id) {
 		return (T) entityManager.find(entityClass, id);
 	}
 
@@ -50,8 +48,9 @@ public class Repository<T extends BaseEntity> implements Serializable {
 		return entityManager.merge(t);
 	}
 
-	public void save(T t) {
+	public T save(T t) {
 		entityManager.persist(t);
+		return t;
 	}
 
 	@SuppressWarnings("unchecked")

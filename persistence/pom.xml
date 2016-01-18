@@ -19,11 +19,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.matt.budget</groupId>
-			<artifactId>models</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
 			<scope>provided</scope>

@@ -8,7 +8,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.matt.budget.models.Workspace;
@@ -22,6 +25,7 @@ public interface WorkspaceResource {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response create(Workspace entity);
 
 	@DELETE
@@ -30,7 +34,7 @@ public interface WorkspaceResource {
 
 	@GET
 	@Path("/{workspaceId:[0-9][0-9]*}")
-	public Response findById(@PathParam("workspaceId") Integer workspaceId);
+	public Response findById(@PathParam("workspaceId") Integer workspaceId, @Context Request request,@Context HttpHeaders headers);
 
 	@GET
 	public Response list();
