@@ -19,6 +19,9 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.persistence.Cleanup;
+import org.jboss.arquillian.persistence.CleanupStrategy;
+import org.jboss.arquillian.persistence.TestExecutionPhase;
 import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
@@ -39,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RunWith(Arquillian.class)
-public class WorkspaceEndpointTest {
+public class RestIT {
 
 	protected static final String WEB_INF = "src/main/webapp/WEB-INF";
 
@@ -72,6 +75,7 @@ public class WorkspaceEndpointTest {
 
 	@Test
 	@UsingDataSet("workspaces.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
 	public void shouldListWorkspaces() throws Exception {
 		given()
 						.when()
@@ -86,6 +90,7 @@ public class WorkspaceEndpointTest {
 
 	@Test
 	@UsingDataSet("workspaces.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
 	public void shouldGetById() throws Exception {
 		Response response = given()
 																.expect()
@@ -116,6 +121,21 @@ public class WorkspaceEndpointTest {
 		List<String> linkValues = getLinkValues(response);
 
 		MatcherAssert.assertThat(linkValues, Matchers.contains(SELF_LINK, ACCOUNTS_LINK));
+	}
+
+	@Test
+	@UsingDataSet("workspaces.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+	public void shouldListAccounts() {
+		Integer workspaceId = 1;
+		given()
+						.when()
+						.get(basePath + "api/workspaces/" + workspaceId + "/accounts")
+						.then().statusCode(Status.OK.getStatusCode())
+						.body("", hasSize(3))
+						.body("name", hasItem("Test Account 1"))
+						.body("name", hasItem("Test Account 2"))
+						.body("name", hasItem("Test Account 3"));
 	}
 
 	private List<String> getLinkValues(Response r) {
