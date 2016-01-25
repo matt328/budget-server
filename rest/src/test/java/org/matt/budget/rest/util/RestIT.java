@@ -32,7 +32,9 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.matt.budget.models.Account;
 import org.matt.budget.models.Workspace;
+import org.matt.budget.models.enums.AccountType;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Header;
@@ -46,8 +48,9 @@ public class RestIT {
 
 	protected static final String WEB_INF = "src/main/webapp/WEB-INF";
 
-	protected static final String SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1>; rel=\"self\"";
+	protected static final String WORKSPACE_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1>; rel=\"self\"";
 	protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1/accounts>; rel=\"accounts\"";
+	protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/2/accounts/${accountId}>; rel=\"self\"";
 
 	@Deployment
 	public static Archive<?> createDeployment() {
@@ -102,7 +105,7 @@ public class RestIT {
 																.when()
 																.get(basePath + "api/workspaces/1");
 		List<String> linkValues = getLinkValues(response);
-		MatcherAssert.assertThat(linkValues, Matchers.contains(SELF_LINK, ACCOUNTS_LINK));
+		MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK, ACCOUNTS_LINK));
 	}
 
 	@Test
@@ -120,7 +123,7 @@ public class RestIT {
 
 		List<String> linkValues = getLinkValues(response);
 
-		MatcherAssert.assertThat(linkValues, Matchers.contains(SELF_LINK, ACCOUNTS_LINK));
+		MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK, ACCOUNTS_LINK));
 	}
 
 	@Test
@@ -136,6 +139,29 @@ public class RestIT {
 						.body("name", hasItem("Test Account 1"))
 						.body("name", hasItem("Test Account 2"))
 						.body("name", hasItem("Test Account 3"));
+	}
+
+	@Test
+	@UsingDataSet("workspaces.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_TABLES_ONLY)
+	public void shouldCreateAccount() {
+		Account account = Account	.builder()
+															.accountType(AccountType.OFF_BUDGET)
+															.name("Test Account")
+															.note("Test Account Note")
+															.build();
+		log.debug("Creating Account: {}", account);
+		Integer workspaceId = 2;
+		Response response = given()
+																.contentType(ContentType.JSON)
+																.body(account)
+																.expect()
+																.body("name", Matchers.equalTo("Test Account"))
+																.when()
+																.post(basePath + "api/workspaces/" + workspaceId.toString() + "/accounts");
+		List<String> linkValues = getLinkValues(response);
+		Account created = response.getBody().as(Account.class);
+		MatcherAssert.assertThat(linkValues, Matchers.contains(ACCOUNT_SELF_LINK.replace("${accountId}", created.getId().toString())));
 	}
 
 	private List<String> getLinkValues(Response r) {

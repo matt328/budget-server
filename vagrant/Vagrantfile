@@ -62,7 +62,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
-  
+  # Configure VM Ram usage
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+  end  
   # Enable provisioning with a Shell script
   # config.vm.provision :shell, path: "bootstrap.sh"
 

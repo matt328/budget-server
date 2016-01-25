@@ -8,15 +8,15 @@ workspace:
   - id: 4
     name: "porche rally"
 account:
-  - id: 1
+  - id: 2
     name: "Test Account 1"
     workspace_id: 1
     note: "Test Account Note"
-  - id: 2
+  - id: 3
     name: "Test Account 2"
     workspace_id: 1
     note: "Test Account Note"
-  - id: 3
+  - id: 4
     name: "Test Account 3"
     workspace_id: 1
     note: "Test Account Note 3"
@@ -24,8 +24,8 @@ Transaction:
   - id: 1
     payee: "Sheetz"
     amount: 45.00
-    account_id: 1
+    account_id: 2
   - id: 2
     payee: "WalMart"
     amount: 45.00
-    account_id: 1
+    account_id: 2

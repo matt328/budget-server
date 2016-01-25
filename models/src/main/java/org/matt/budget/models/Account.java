@@ -9,12 +9,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -44,14 +46,18 @@ public class Account implements BaseEntity {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(generator = "account_seq")
+	@SequenceGenerator(name = "account_seq", sequenceName = "ACCOUNT_SEQ", allocationSize = 1, initialValue = 100)
 	@XmlElement
 	private Integer id;
 
+	@NotNull
+	@Size(min = 1, max = 32)
 	@Column(name = "name")
 	@XmlElement
 	private String name;
 
+	@Size(max = 255)
 	@Column(name = "note")
 	@XmlElement
 	private String note;
@@ -68,8 +74,10 @@ public class Account implements BaseEntity {
 	@XmlElement
 	private AccountType accountType;
 
+	@XmlTransient
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "workspace_id", nullable = false)
+	@JoinColumn(name = "workspace_id")
 	private Workspace workspace;
 
 	@XmlTransient

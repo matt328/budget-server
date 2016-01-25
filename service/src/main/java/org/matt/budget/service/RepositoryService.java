@@ -20,6 +20,11 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 	@Inject
 	private Repository<T> repo;
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Repository<T> repo() {
+		return repo;
+	}
+	
 	public T findById(Serializable id) {
 		return repo.find(id);
 	}
@@ -38,7 +43,7 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 		}
 
 		beforeInsert(entity);
-		T created = repo.save(entity);
+		T created = repo().save(entity);
 		afterInsert(entity);
 		
 		return created;
@@ -52,7 +57,7 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 			throw new InvalidDataException("Entity cannot be transient");
 		}
 		beforeUpdate(entity);
-		repo.update(entity);
+		repo().update(entity);
 		afterUpdate(entity);
 	}
 

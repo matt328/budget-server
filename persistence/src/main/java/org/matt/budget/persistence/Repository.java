@@ -45,7 +45,8 @@ public class Repository<T> implements Serializable {
 	}
 
 	public T update(T t) {
-		return entityManager.merge(t);
+		t = entityManager.merge(t);
+		return t;
 	}
 
 	public T save(T t) {

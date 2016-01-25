@@ -14,11 +14,12 @@ import javax.ws.rs.core.Response;
 import org.matt.budget.models.Account;
 
 @Path("/accounts")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public interface AccountResource {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response create(Account entity);
 
 	@DELETE
