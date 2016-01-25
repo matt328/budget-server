@@ -50,8 +50,6 @@ public class AccountEndpoint implements AccountResource {
 	public Response create(Account entity) {
 		Account created = workspaceService.addAccount(entity, workspaceId);
 
-		log.debug("created ID: {}", created.getId());
-
 		return Response	.created(UriBuilder
 																			.fromResource(AccountEndpoint.class)
 																			.path(String.valueOf(entity.getId()))
