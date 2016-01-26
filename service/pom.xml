@@ -11,7 +11,7 @@
   
   <artifactId>service</artifactId>
 
-  <name>service</name>
+  <name>Budget :: Service Module</name>
   <url>http://maven.apache.org</url>
   
   <properties>

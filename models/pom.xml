@@ -11,7 +11,7 @@
 
 	<artifactId>models</artifactId>
 
-	<name>Budget :: Models</name>
+	<name>Budget :: Data Model Module</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

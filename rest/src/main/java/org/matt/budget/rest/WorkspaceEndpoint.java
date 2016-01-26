@@ -25,9 +25,6 @@ import org.matt.budget.rest.common.AccountResource;
 import org.matt.budget.rest.common.WorkspaceResource;
 import org.matt.budget.service.WorkspaceService;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @RequestScoped
 @Path("/workspaces")
 public class WorkspaceEndpoint implements WorkspaceResource {

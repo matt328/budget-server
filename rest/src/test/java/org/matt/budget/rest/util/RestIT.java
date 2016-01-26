@@ -46,130 +46,131 @@ import lombok.extern.slf4j.Slf4j;
 @RunWith(Arquillian.class)
 public class RestIT {
 
-	protected static final String WEB_INF = "src/main/webapp/WEB-INF";
+  protected static final String WEB_INF = "src/main/webapp/WEB-INF";
 
-	protected static final String WORKSPACE_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1>; rel=\"self\"";
-	protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1/accounts>; rel=\"accounts\"";
-	protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/2/accounts/${accountId}>; rel=\"self\"";
+  protected static final String WORKSPACE_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}>; rel=\"self\"";
+  protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";
+  protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/2/accounts/${accountId}>; rel=\"self\"";
 
-	@Deployment
-	public static Archive<?> createDeployment() {
-		MavenResolverSystem resolver = Maven.resolver();
-		WebArchive war = ShrinkWrap	.create(WebArchive.class, "test.war")
-																.addPackage(Workspace.class.getPackage())
-																.addPackages(true, "org.matt.budget")
-																.addAsResource("test-persistence.xml", "META-INF/persistence.xml")
-																.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-																.addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("com.jayway.restassured:rest-assured").withTransitivity().asFile())
-																.addAsWebInfResource(new File(WEB_INF, "web.xml"), "web.xml")
-																.addAsWebInfResource(new File(WEB_INF, "beans.xml"), "beans.xml");
-		log.debug(war.toString(true));
-		return war;
-	}
+  @Deployment
+  public static Archive<?> createDeployment() {
+    MavenResolverSystem resolver = Maven.resolver();
+    WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
+                               .addPackage(Workspace.class.getPackage())
+                               .addPackages(true, "org.matt.budget")
+                               .addAsResource("test-persistence.xml", "META-INF/persistence.xml")
+                               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                               .addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("com.jayway.restassured:rest-assured").withTransitivity().asFile())
+                               .addAsWebInfResource(new File(WEB_INF, "web.xml"), "web.xml")
+                               .addAsWebInfResource(new File(WEB_INF, "beans.xml"), "beans.xml");
+    log.debug(war.toString(true));
+    return war;
+  }
 
-	@ArquillianResource
-	URL basePath;
+  @ArquillianResource
+  URL basePath;
 
-	@PersistenceContext
-	EntityManager em;
+  @PersistenceContext
+  EntityManager em;
 
-	@Inject
-	UserTransaction utx;
+  @Inject
+  UserTransaction utx;
 
-	@Test
-	@UsingDataSet("workspaces.yml")
-	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void shouldListWorkspaces() throws Exception {
-		given()
-						.when()
-						.get(basePath + "api/workspaces")
-						.then().statusCode(Status.OK.getStatusCode())
-						.body("", hasSize(4))
-						.body("name", hasItem("ferrari spider"))
-						.body("name", hasItem("mustang spider"))
-						.body("name", hasItem("porche avenger"))
-						.body("name", hasItem("porche rally"));
-	}
+  @Test
+  @UsingDataSet("workspaces.yml")
+  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+  public void shouldListWorkspaces() throws Exception {
+    given()
+           .when()
+           .get(basePath + "api/workspaces")
+           .then().statusCode(Status.OK.getStatusCode())
+           .body("", hasSize(4))
+           .body("name", hasItem("ferrari spider"))
+           .body("name", hasItem("mustang spider"))
+           .body("name", hasItem("porche avenger"))
+           .body("name", hasItem("porche rally"));
+  }
 
-	@Test
-	@UsingDataSet("workspaces.yml")
-	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void shouldGetById() throws Exception {
-		Response response = given()
-																.expect()
-																.statusCode(Status.OK.getStatusCode())
-																.header("ETag", Matchers.anything())
-																.header("Cache-Control", Matchers.is("no-transform, max-age=100"))
-																.body("id", Matchers.is(1))
-																.body("name", Matchers.is("ferrari spider"))
-																.when()
-																.get(basePath + "api/workspaces/1");
-		List<String> linkValues = getLinkValues(response);
-		MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK, ACCOUNTS_LINK));
-	}
+  @Test
+  @UsingDataSet("workspaces.yml")
+  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+  public void shouldGetById() throws Exception {
+    Response response = given()
+                               .expect()
+                               .statusCode(Status.OK.getStatusCode())
+                               .header("ETag", Matchers.anything())
+                               .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
+                               .body("id", Matchers.is(1))
+                               .body("name", Matchers.is("ferrari spider"))
+                               .when()
+                               .get(basePath + "api/workspaces/1");
+    List<String> linkValues = getLinkValues(response);
+    Workspace created = response.getBody().as(Workspace.class);
+    MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK.replace("${workspaceId}", created.getId().toString()), ACCOUNTS_LINK.replace("${workspaceId}", created.getId().toString())));
+  }
 
-	@Test
-	public void shouldCreateWorkspace() {
-		Workspace entity = Workspace.builder()
-																.name("TestWorkspace")
-																.build();
-		Response response = given()
-																.contentType(ContentType.JSON)
-																.body(entity)
-																.expect()
-																.body("name", Matchers.equalTo("TestWorkspace"))
-																.when()
-																.post(basePath + "api/workspaces");
+  @Test
+  public void shouldCreateWorkspace() {
+    Workspace entity = Workspace.builder()
+                                .name("TestWorkspace")
+                                .build();
+    Response response = given()
+                               .contentType(ContentType.JSON)
+                               .body(entity)
+                               .expect()
+                               .body("name", Matchers.equalTo("TestWorkspace"))
+                               .when()
+                               .post(basePath + "api/workspaces");
 
-		List<String> linkValues = getLinkValues(response);
+    List<String> linkValues = getLinkValues(response);
+    Workspace created = response.getBody().as(Workspace.class);
+    MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK.replace("${workspaceId}", created.getId().toString()), ACCOUNTS_LINK.replace("${workspaceId}", created.getId().toString())));
+  }
 
-		MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK, ACCOUNTS_LINK));
-	}
+  @Test
+  @UsingDataSet("workspaces.yml")
+  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+  public void shouldListAccounts() {
+    Integer workspaceId = 1;
+    given()
+           .when()
+           .get(basePath + "api/workspaces/" + workspaceId + "/accounts")
+           .then().statusCode(Status.OK.getStatusCode())
+           .body("", hasSize(3))
+           .body("name", hasItem("Test Account 1"))
+           .body("name", hasItem("Test Account 2"))
+           .body("name", hasItem("Test Account 3"));
+  }
 
-	@Test
-	@UsingDataSet("workspaces.yml")
-	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void shouldListAccounts() {
-		Integer workspaceId = 1;
-		given()
-						.when()
-						.get(basePath + "api/workspaces/" + workspaceId + "/accounts")
-						.then().statusCode(Status.OK.getStatusCode())
-						.body("", hasSize(3))
-						.body("name", hasItem("Test Account 1"))
-						.body("name", hasItem("Test Account 2"))
-						.body("name", hasItem("Test Account 3"));
-	}
+  @Test
+  @UsingDataSet("workspaces.yml")
+  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_TABLES_ONLY)
+  public void shouldCreateAccount() {
+    Account account = Account.builder()
+                             .accountType(AccountType.OFF_BUDGET)
+                             .name("Test Account")
+                             .note("Test Account Note")
+                             .build();
+    log.debug("Creating Account: {}", account);
+    Integer workspaceId = 2;
+    Response response = given()
+                               .contentType(ContentType.JSON)
+                               .body(account)
+                               .expect()
+                               .body("name", Matchers.equalTo("Test Account"))
+                               .when()
+                               .post(basePath + "api/workspaces/" + workspaceId.toString() + "/accounts");
+    List<String> linkValues = getLinkValues(response);
+    Account created = response.getBody().as(Account.class);
+    MatcherAssert.assertThat(linkValues, Matchers.contains(ACCOUNT_SELF_LINK.replace("${accountId}", created.getId().toString())));
+  }
 
-	@Test
-	@UsingDataSet("workspaces.yml")
-	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_TABLES_ONLY)
-	public void shouldCreateAccount() {
-		Account account = Account	.builder()
-															.accountType(AccountType.OFF_BUDGET)
-															.name("Test Account")
-															.note("Test Account Note")
-															.build();
-		log.debug("Creating Account: {}", account);
-		Integer workspaceId = 2;
-		Response response = given()
-																.contentType(ContentType.JSON)
-																.body(account)
-																.expect()
-																.body("name", Matchers.equalTo("Test Account"))
-																.when()
-																.post(basePath + "api/workspaces/" + workspaceId.toString() + "/accounts");
-		List<String> linkValues = getLinkValues(response);
-		Account created = response.getBody().as(Account.class);
-		MatcherAssert.assertThat(linkValues, Matchers.contains(ACCOUNT_SELF_LINK.replace("${accountId}", created.getId().toString())));
-	}
-
-	private List<String> getLinkValues(Response r) {
-		List<Header> links = r.headers().getList("Link");
-		List<String> linkValues = links	.stream()
-																		.map(l -> l.getValue())
-																		.collect(Collectors.toList());
-		return linkValues;
-	}
+  private List<String> getLinkValues(Response r) {
+    List<Header> links = r.headers().getList("Link");
+    List<String> linkValues = links.stream()
+                                   .map(l -> l.getValue())
+                                   .collect(Collectors.toList());
+    return linkValues;
+  }
 
 }

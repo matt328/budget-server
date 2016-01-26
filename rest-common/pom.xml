@@ -11,7 +11,7 @@
 
 	<artifactId>rest-common</artifactId>
 
-	<name>rest-common</name>
+	<name>Budget :: Rest Common Module</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
