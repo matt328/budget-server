@@ -50,7 +50,7 @@ public class RestIT {
 
   protected static final String WORKSPACE_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}>; rel=\"self\"";
   protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";
-  protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/2/accounts/${accountId}>; rel=\"self\"";
+  protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1/accounts/${accountId}>; rel=\"self\"";
 
   @Deployment
   public static Archive<?> createDeployment() {
@@ -94,7 +94,7 @@ public class RestIT {
   @Test
   @UsingDataSet("workspaces.yml")
   @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-  public void shouldGetById() throws Exception {
+  public void shouldGetWorkspaceById() throws Exception {
     Response response = given()
                                .expect()
                                .statusCode(Status.OK.getStatusCode())
@@ -151,8 +151,7 @@ public class RestIT {
                              .name("Test Account")
                              .note("Test Account Note")
                              .build();
-    log.debug("Creating Account: {}", account);
-    Integer workspaceId = 2;
+    Integer workspaceId = 1;
     Response response = given()
                                .contentType(ContentType.JSON)
                                .body(account)
@@ -163,6 +162,23 @@ public class RestIT {
     List<String> linkValues = getLinkValues(response);
     Account created = response.getBody().as(Account.class);
     MatcherAssert.assertThat(linkValues, Matchers.contains(ACCOUNT_SELF_LINK.replace("${accountId}", created.getId().toString())));
+  }
+
+  @Test
+  @UsingDataSet("workspaces.yml")
+  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_TABLES_ONLY)
+  public void shouldGetAccountById() {
+    Response response = given()
+                               .expect()
+                               .statusCode(Status.OK.getStatusCode())
+                               .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
+                               .body("id", Matchers.is(2))
+                               .body("name", Matchers.is("Test Account 1"))
+                               .when()
+                               .get(basePath + "api/workspaces/1/accounts/2");
+    List<String> linkValues = getLinkValues(response);
+    String selfLink = ACCOUNT_SELF_LINK.replace("${accountId}", "2");
+    MatcherAssert.assertThat(linkValues, Matchers.contains(selfLink));
   }
 
   private List<String> getLinkValues(Response r) {

@@ -39,7 +39,8 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 	WorkspaceService workspaceService;
 
 	@Override
-	public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId) {
+  @Path("/{workspaceId:[0-9][0-9]*}/accounts")
+  public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId) {
 		return resourceContext.getResource(AccountEndpoint.class);
 	}
 

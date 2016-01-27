@@ -12,6 +12,9 @@ import org.matt.budget.persistence.BaseEntity;
 import org.matt.budget.persistence.Repository;
 import org.matt.budget.service.exception.InvalidDataException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Dependent
 public abstract class RepositoryService<T extends BaseEntity> implements Serializable {
 
@@ -24,11 +27,12 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 	public Repository<T> repo() {
 		return repo;
 	}
-	
+
 	public T findById(Serializable id) {
+	  log.debug("Finding Account by id: {}", id);
 		return repo.find(id);
 	}
-	
+
 	public List<T> list() {
 		return repo.findAll();
 	}
@@ -45,7 +49,7 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
 		beforeInsert(entity);
 		T created = repo().save(entity);
 		afterInsert(entity);
-		
+
 		return created;
 	}
 

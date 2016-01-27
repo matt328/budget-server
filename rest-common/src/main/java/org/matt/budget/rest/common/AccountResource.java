@@ -13,29 +13,32 @@ import javax.ws.rs.core.Response;
 
 import org.matt.budget.models.Account;
 
-@Path("/accounts")
+@Path("")
 @Produces(MediaType.APPLICATION_JSON)
 public interface AccountResource {
 
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response create(Account entity);
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response create(Account entity);
 
-	@DELETE
-	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") Integer id);
+  @DELETE
+  @Path("/{id:[0-9][0-9]*}")
+  public Response deleteById(@PathParam("id") Integer id);
 
-	@GET
-	@Path("/{id:[0-9][0-9]*}")
-	public Response findById(@PathParam("id") Integer id);
+  @GET
+  @Path("/{id:[0-9][0-9]*}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response findById(@PathParam("id") Integer id);
 
-	@GET
-	public Response list();
+  @GET
+  @Path("/")
+  public Response list();
 
-	@PUT
-	@Path("/{id:[0-9][0-9]*}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") Integer id, Account entity);
+  @PUT
+  @Path("/{id:[0-9][0-9]*}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response update(@PathParam("id") Integer id, Account entity);
 
 }
