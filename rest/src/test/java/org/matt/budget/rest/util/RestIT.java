@@ -40,6 +40,7 @@ import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Header;
 import com.jayway.restassured.response.Response;
 
+import io.undertow.util.Headers;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -50,7 +51,8 @@ public class RestIT {
 
   protected static final String WORKSPACE_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}>; rel=\"self\"";
   protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";
-  protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/1/accounts/${accountId}>; rel=\"self\"";
+  protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts/${accountId}>; rel=\"self\"";
+  protected static final String ACCOUNTS_URI = "http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts/${accountId}";
 
   @Deployment
   public static Archive<?> createDeployment() {
@@ -152,16 +154,22 @@ public class RestIT {
                              .note("Test Account Note")
                              .build();
     Integer workspaceId = 1;
+    String expectedLocationHeader = ACCOUNTS_URI.replace("${workspaceId}", workspaceId.toString()).replace("${accountId}", "100");
+
     Response response = given()
                                .contentType(ContentType.JSON)
                                .body(account)
                                .expect()
                                .body("name", Matchers.equalTo("Test Account"))
+                               .header(Headers.LOCATION_STRING, Matchers.equalTo(expectedLocationHeader))
                                .when()
                                .post(basePath + "api/workspaces/" + workspaceId.toString() + "/accounts");
     List<String> linkValues = getLinkValues(response);
     Account created = response.getBody().as(Account.class);
-    MatcherAssert.assertThat(linkValues, Matchers.contains(ACCOUNT_SELF_LINK.replace("${accountId}", created.getId().toString())));
+
+    String expectedSelfLink = ACCOUNT_SELF_LINK.replace("${accountId}", created.getId().toString()).replace("${workspaceId}", workspaceId.toString());
+
+    MatcherAssert.assertThat(linkValues, Matchers.contains(expectedSelfLink));
   }
 
   @Test
@@ -177,7 +185,7 @@ public class RestIT {
                                .when()
                                .get(basePath + "api/workspaces/1/accounts/2");
     List<String> linkValues = getLinkValues(response);
-    String selfLink = ACCOUNT_SELF_LINK.replace("${accountId}", "2");
+    String selfLink = ACCOUNT_SELF_LINK.replace("${accountId}", "2").replace("${workspaceId}", "1");
     MatcherAssert.assertThat(linkValues, Matchers.contains(selfLink));
   }
 

@@ -5,12 +5,7 @@ import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -19,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.matt.budget.models.Account;
@@ -32,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequestScoped
-@Path("")
 public class AccountEndpoint implements AccountResource {
 
   @Context
@@ -53,17 +46,11 @@ public class AccountEndpoint implements AccountResource {
   @Inject
   WorkspaceService workspaceService;
 
-  @POST
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
   @Override
   public Response create(Account entity) {
     Account created = workspaceService.addAccount(entity, workspaceId);
 
-    return Response.created(UriBuilder
-                                      .fromResource(AccountEndpoint.class)
-                                      .path(String.valueOf(entity.getId()))
-                                      .build())
+    return Response.created(getSelfLink(created.getId()).getUri())
                    .entity(entity)
                    .header("ETag", entity.hashCode())
                    .links(new Link[] { getSelfLink(created.getId()) })
@@ -77,10 +64,6 @@ public class AccountEndpoint implements AccountResource {
   }
 
   @Override
-  @GET
-  @Path("/{id:[0-9][0-9]*}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
   public Response findById(@PathParam("id") Integer id) {
     Account account;
     try {
