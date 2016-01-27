@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import org.matt.budget.models.Workspace;
 
 @Path("/workspaces")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public interface WorkspaceResource {
 
@@ -24,8 +25,6 @@ public interface WorkspaceResource {
 	public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId);
 
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response create(Workspace entity);
 
 	@DELETE
@@ -41,7 +40,6 @@ public interface WorkspaceResource {
 
 	@PUT
 	@Path("/{workspaceId:[0-9][0-9]*}")
-	@Consumes(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("workspaceId") Integer workspaceId, Workspace entity);
 
 }

@@ -6,7 +6,6 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.CacheControl;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.matt.budget.models.Workspace;
@@ -26,7 +24,6 @@ import org.matt.budget.rest.common.WorkspaceResource;
 import org.matt.budget.service.WorkspaceService;
 
 @RequestScoped
-@Path("/workspaces")
 public class WorkspaceEndpoint implements WorkspaceResource {
 
 	@Context
@@ -39,7 +36,6 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 	WorkspaceService workspaceService;
 
 	@Override
-  @Path("/{workspaceId:[0-9][0-9]*}/accounts")
   public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId) {
 		return resourceContext.getResource(AccountEndpoint.class);
 	}
@@ -48,12 +44,8 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 	public Response create(Workspace entity) {
 		Workspace created = workspaceService.insert(entity);
 
-		return Response	.created(UriBuilder.fromResource(WorkspaceResource.class)
-																			.path(WorkspaceResource.class)
-																			.path(Integer.toString(created.getId()))
-																			.build())
+		return Response	.created(getSelfLink(created.getId()).getUri())
 										.entity(created)
-										.header("ETag", created.hashCode())
 										.links(new Link[] { getSelfLink(created.getId()), getAccountsLink(created.getId()) })
 										.build();
 	}

@@ -53,6 +53,7 @@ public class RestIT {
   protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";
   protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts/${accountId}>; rel=\"self\"";
   protected static final String ACCOUNTS_URI = "http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts/${accountId}";
+  protected static final String WORKSPACE_URI = "http://0.0.0.0:8080/test/api/workspaces/${workspaceId}";
 
   @Deployment
   public static Archive<?> createDeployment() {
@@ -116,11 +117,15 @@ public class RestIT {
     Workspace entity = Workspace.builder()
                                 .name("TestWorkspace")
                                 .build();
+
+    String expectedWorkspaceLocation = WORKSPACE_URI.replace("${workspaceId}", "100");
+
     Response response = given()
                                .contentType(ContentType.JSON)
                                .body(entity)
                                .expect()
                                .body("name", Matchers.equalTo("TestWorkspace"))
+                               .header(Headers.LOCATION_STRING, Matchers.equalTo(expectedWorkspaceLocation))
                                .when()
                                .post(basePath + "api/workspaces");
 
