@@ -35,7 +35,8 @@ public abstract class BaseRestIT {
                                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                                .addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("com.jayway.restassured:rest-assured").withTransitivity().asFile())
                                .addAsWebInfResource(new File(WEB_INF, "web.xml"), "web.xml")
-                               .addAsWebInfResource(new File(WEB_INF, "beans.xml"), "beans.xml");
+                               .addAsWebInfResource(new File(WEB_INF, "beans.xml"), "beans.xml")
+                               .addAsWebInfResource(new File(WEB_INF, "ejb-jar.xml"), "ejb-jar.xml");
     return war;
   }
 
@@ -45,6 +46,10 @@ public abstract class BaseRestIT {
                                    .map(l -> l.getValue())
                                    .collect(Collectors.toList());
     return linkValues;
+  }
+
+  protected String getHeaderValue(Response r, String headerName) {
+    return r.header(headerName);
   }
 
 }

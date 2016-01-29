@@ -3,6 +3,7 @@ package org.matt.budget.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,33 +25,36 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(exclude = { "accounts" })
 @Builder
 @AllArgsConstructor
 @Entity
+@Cacheable
 @Table(name = "workspace")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class Workspace implements BaseEntity {
 
-	public Workspace() {
-		accounts = new ArrayList<>();
-	}
+  public Workspace() {
+    accounts = new ArrayList<>();
+  }
 
-	@Id
+  @Id
   @GeneratedValue(generator = "workspace_seq")
   @SequenceGenerator(name = "workspace_seq", sequenceName = "WORKSPACE_SEQ", allocationSize = 1, initialValue = 100)
-	@XmlElement
-	private Integer id;
+  @XmlElement
+  private Integer id;
 
-	@Column(name = "name")
-	@XmlElement
-	private String name;
+  @Column(name = "name")
+  @XmlElement
+  private String name;
 
-	@JsonIgnore
-	@XmlTransient
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
-	private List<Account> accounts;
+  @JsonIgnore
+  @XmlTransient
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+  private List<Account> accounts;
 
 }

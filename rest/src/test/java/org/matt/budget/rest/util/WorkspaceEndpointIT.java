@@ -17,9 +17,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.persistence.Cleanup;
-import org.jboss.arquillian.persistence.CleanupStrategy;
-import org.jboss.arquillian.persistence.TestExecutionPhase;
+import org.jboss.arquillian.persistence.CleanupUsingScript;
 import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
@@ -33,6 +31,7 @@ import com.jayway.restassured.response.Response;
 import io.undertow.util.Headers;
 
 @RunWith(Arquillian.class)
+@CleanupUsingScript("cleanup.sql")
 public class WorkspaceEndpointIT extends BaseRestIT {
 
   @Deployment
@@ -51,7 +50,6 @@ public class WorkspaceEndpointIT extends BaseRestIT {
 
   @Test
   @UsingDataSet("workspaces.yml")
-  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
   public void shouldListWorkspaces() throws Exception {
     given()
            .when()
@@ -65,21 +63,94 @@ public class WorkspaceEndpointIT extends BaseRestIT {
   }
 
   @Test
+  public void shouldNotGetWorkspace() throws Exception {
+    given()
+           .expect()
+           .statusCode(Status.NOT_FOUND.getStatusCode())
+           .when()
+           .get(basePath + "api/workspaces/1");
+  }
+
+  @Test
   @UsingDataSet("workspaces.yml")
-  @Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
   public void shouldGetWorkspaceById() throws Exception {
     Response response = given()
                                .expect()
                                .statusCode(Status.OK.getStatusCode())
-                               .header("ETag", Matchers.anything())
                                .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
                                .body("id", Matchers.is(1))
                                .body("name", Matchers.is("ferrari spider"))
                                .when()
                                .get(basePath + "api/workspaces/1");
+
     List<String> linkValues = getLinkValues(response);
+
     Workspace created = response.getBody().as(Workspace.class);
+
     MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK.replace("${workspaceId}", created.getId().toString()), ACCOUNTS_LINK.replace("${workspaceId}", created.getId().toString())));
+
+    String expectedEtag = "\"" + Integer.toString(created.hashCode()) + "\"";
+    String actualEtag = getHeaderValue(response, "ETag");
+    MatcherAssert.assertThat(actualEtag, Matchers.equalTo(expectedEtag));
+  }
+
+  @Test
+  @UsingDataSet("workspaces.yml")
+  public void shouldFailUpdateWithNullEntity() throws Exception {
+    given()
+           .contentType(ContentType.JSON)
+           .expect()
+           .body(Matchers.isEmptyOrNullString())
+           .when()
+           .put(basePath + "api/workspaces/102");
+  }
+
+  @Test
+  @UsingDataSet("workspaces.yml")
+  public void shouldFailUpdateWithWrongId() throws Exception {
+    Workspace entity = Workspace.builder()
+                                .name("TestWorkspace")
+                                .build();
+    Response response = given()
+                               .contentType(ContentType.JSON)
+                               .body(entity)
+                               .expect()
+                               .body("name", Matchers.equalTo("TestWorkspace"))
+                               .when()
+                               .post(basePath + "api/workspaces");
+    Workspace created = response.getBody().as(Workspace.class);
+    created.setName("Updated Name");
+
+    given()
+           .contentType(ContentType.JSON)
+           .body(created)
+           .expect()
+           .statusCode(Status.CONFLICT.getStatusCode())
+           .when()
+           .put(basePath + "api/workspaces/102");
+  }
+
+  @Test
+  @UsingDataSet("workspaces.yml")
+  public void shouldCacheWithEtag() throws Exception {
+    Response response = given()
+                               .expect()
+                               .statusCode(Status.OK.getStatusCode())
+                               .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
+                               .body("id", Matchers.is(1))
+                               .body("name", Matchers.is("ferrari spider"))
+                               .when()
+                               .get(basePath + "api/workspaces/1");
+
+    String etag = getHeaderValue(response, "ETag");
+
+    given()
+           .header(Headers.IF_NONE_MATCH_STRING, etag)
+           .expect()
+           .statusCode(Status.NOT_MODIFIED.getStatusCode())
+           .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
+           .when()
+           .get(basePath + "api/workspaces/1");
   }
 
   @Test
@@ -88,20 +159,52 @@ public class WorkspaceEndpointIT extends BaseRestIT {
                                 .name("TestWorkspace")
                                 .build();
 
-    String expectedWorkspaceLocation = WORKSPACE_URI.replace("${workspaceId}", "100");
-
     Response response = given()
                                .contentType(ContentType.JSON)
                                .body(entity)
                                .expect()
                                .body("name", Matchers.equalTo("TestWorkspace"))
-                               .header(Headers.LOCATION_STRING, Matchers.equalTo(expectedWorkspaceLocation))
                                .when()
                                .post(basePath + "api/workspaces");
 
     List<String> linkValues = getLinkValues(response);
+
     Workspace created = response.getBody().as(Workspace.class);
+
+    String expectedWorkspaceLocation = WORKSPACE_URI.replace("${workspaceId}", created.getId().toString());
+
     MatcherAssert.assertThat(linkValues, Matchers.contains(WORKSPACE_SELF_LINK.replace("${workspaceId}", created.getId().toString()), ACCOUNTS_LINK.replace("${workspaceId}", created.getId().toString())));
+
+    String location = getHeaderValue(response, Headers.LOCATION_STRING);
+
+    MatcherAssert.assertThat(location, Matchers.equalTo(expectedWorkspaceLocation));
+
+  }
+
+  @Test
+  @UsingDataSet("workspaces.yml")
+  public void shouldUpdateWorkspace() {
+    Workspace entity = Workspace.builder()
+                                .id(1)
+                                .name("TestWorkspace")
+                                .build();
+
+    given()
+           .contentType(ContentType.JSON)
+           .body(entity)
+           .expect()
+           .statusCode(Status.NO_CONTENT.getStatusCode())
+           .when()
+           .put(basePath + "api/workspaces/1");
+
+    given()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
+        .body("id", Matchers.is(1))
+        .body("name", Matchers.is("TestWorkspace"))
+        .when()
+        .get(basePath + "api/workspaces/1");
   }
 
 }
