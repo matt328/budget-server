@@ -1,6 +1,8 @@
 package org.matt.budget.service.exception;
 
-public class InvalidDataException extends RuntimeException {
+import javax.persistence.PersistenceException;
+
+public class InvalidDataException extends PersistenceException {
 
 	private static final long serialVersionUID = 1L;
 

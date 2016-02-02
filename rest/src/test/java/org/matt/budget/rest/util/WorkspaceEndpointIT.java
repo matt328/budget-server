@@ -198,13 +198,13 @@ public class WorkspaceEndpointIT extends BaseRestIT {
            .put(basePath + "api/workspaces/1");
 
     given()
-        .expect()
-        .statusCode(Status.OK.getStatusCode())
-        .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
-        .body("id", Matchers.is(1))
-        .body("name", Matchers.is("TestWorkspace"))
-        .when()
-        .get(basePath + "api/workspaces/1");
+           .expect()
+           .statusCode(Status.OK.getStatusCode())
+           .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
+           .body("id", Matchers.is(1))
+           .body("name", Matchers.is("TestWorkspace"))
+           .when()
+           .get(basePath + "api/workspaces/1");
   }
 
 }

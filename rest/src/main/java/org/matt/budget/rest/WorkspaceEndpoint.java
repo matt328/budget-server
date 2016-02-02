@@ -5,7 +5,6 @@ import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
-import javax.persistence.OptimisticLockException;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.CacheControl;
@@ -102,13 +101,8 @@ public class WorkspaceEndpoint implements WorkspaceResource {
                      .entity(entity)
                      .build();
     }
-    try {
-      workspaceService.update(entity);
-    } catch (OptimisticLockException e) {
-      return Response.status(Status.CONFLICT)
-                     .entity(e.getEntity())
-                     .build();
-    }
+
+    workspaceService.update(entity);
     return Response.noContent().build();
   }
 

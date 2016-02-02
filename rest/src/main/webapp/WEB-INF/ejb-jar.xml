@@ -6,7 +6,7 @@
 
   <assembly-descriptor>
     <application-exception>
-      <exception-class>javax.persistence.NoResultException</exception-class>
+      <exception-class>javax.persistence.PersistenceException</exception-class>
       <rollback>true</rollback>
     </application-exception>
   </assembly-descriptor>
