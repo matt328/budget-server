@@ -27,28 +27,28 @@ import lombok.Data;
 @XmlRootElement
 public class Transaction implements BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Integer id;
 
-	@Column(name = "payee")
-	@XmlElement
-	private String payee;
+  @Column(name = "payee")
+  @XmlElement
+  private String payee;
 
-	@Column(name = "note")
-	@XmlElement
-	private String note;
+  @Column(name = "note")
+  @XmlElement
+  private String note;
 
-	@Column(name = "amount")
-	@XmlElement
-	private BigDecimal amount;
+  @Column(name = "amount")
+  @XmlElement
+  private BigDecimal amount;
 
-	@Column(name = "transactionDate")
-	@XmlElement
-	private LocalDateTime transactionDate;
+  @Column(name = "transactionDate")
+  @XmlElement
+  private LocalDateTime transactionDate;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "account_id", nullable = false)
-	@XmlElement
-	private Account account;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "account_id", nullable = false)
+  @XmlElement
+  private Account account;
 }

@@ -1,0 +1,6 @@
+users:
+  - id: 1
+    name: "Matt"
+    userId: "matt"
+    passwordHash: "$2a$12$xjQpmS1QqHym2XVakc8wZON.4C0DSijKzmuclxDoSJ5QYFcCKYzZi"
+token:

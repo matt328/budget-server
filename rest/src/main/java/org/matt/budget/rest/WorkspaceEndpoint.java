@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.CacheControl;
@@ -21,7 +20,11 @@ import org.matt.budget.models.Workspace;
 import org.matt.budget.rest.common.AccountResource;
 import org.matt.budget.rest.common.WorkspaceResource;
 import org.matt.budget.service.WorkspaceService;
+import org.matt.budget.service.exception.ObjectNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RequestScoped
 public class WorkspaceEndpoint implements WorkspaceResource {
 
@@ -60,8 +63,10 @@ public class WorkspaceEndpoint implements WorkspaceResource {
     Workspace entity;
 
     try {
+      log.debug("finding by id: {}", workspaceId);
       entity = workspaceService.findById(workspaceId);
-    } catch (NoResultException ex) {
+    } catch (Exception ex) {
+      log.debug("Caught ObjectNotFoundException");
       return Response.status(Status.NOT_FOUND).build();
     }
 

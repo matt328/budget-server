@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -26,7 +27,15 @@ public class Repository<T> implements Serializable {
   protected EntityManager entityManager;
 
   protected Class<T> entityClass;
-
+  
+  public T findSingleWithNamedQuery(String queryName, Map<String, Object> queryParameters) {
+    TypedQuery<T> q = entityManager.createNamedQuery(queryName, getEntityClass());
+    for(Map.Entry<String, Object> param : queryParameters.entrySet()) {
+      q.setParameter(param.getKey(), param.getValue());
+    }
+    return q.getSingleResult();
+  }
+  
   public List<T> findAll() {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<T> cq = cb.createQuery(entityClass);
@@ -42,7 +51,6 @@ public class Repository<T> implements Serializable {
   public T find(Serializable id) {
     T t = entityManager.find(entityClass, id);
     if (t == null) {
-      log.warn("Entity of type {} was not found for id: {}", entityClass.getName(), id);
       throw new NoResultException();
     } else {
       return t;

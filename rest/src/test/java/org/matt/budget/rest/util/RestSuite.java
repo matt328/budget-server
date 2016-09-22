@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
                 WorkspaceEndpointIT.class,
                 AccountEndpointIT.class,
+                AuthenticationEndpointIT.class,
 })
 public class RestSuite {
 

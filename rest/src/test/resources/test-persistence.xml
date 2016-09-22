@@ -9,6 +9,8 @@
 		<class>org.matt.budget.models.Workspace</class>
 		<class>org.matt.budget.models.Account</class>
 		<class>org.matt.budget.models.Transaction</class>
+		<class>org.matt.budget.models.User</class>
+		<class>org.matt.budget.models.Token</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 
 		<properties>
