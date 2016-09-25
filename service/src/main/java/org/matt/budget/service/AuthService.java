@@ -6,6 +6,9 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +25,10 @@ import org.matt.budget.service.exception.ServiceException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -45,9 +49,6 @@ public class AuthService implements Serializable {
   @Inject
   @BCryptEncryption
   EncryptionService encryptionService;
-
-  @Inject
-  TokenService tokenService;
 
   public boolean authenticate(String userId, String password) {
 
@@ -93,10 +94,10 @@ public class AuthService implements Serializable {
   public String issueToken(String userId) {
     SigningKey key = signingKeyService.findSingleWithNamedQuery(SigningKey.FIND_ACTIVE, new HashMap<>());
 
-    if(key == null) {
+    if (key == null) {
       return null;
     }
-    
+
     JWSSigner signer = new RSASSASigner(key.getPrivateKey());
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer("budget-server")
                                                        .expirationTime(new Date(new Date().getTime() + 60 * 1000))
@@ -113,6 +114,84 @@ public class AuthService implements Serializable {
     }
 
     return signedJWT.serialize();
+  }
+
+  public boolean isTokenValid(String token) {
+
+    SigningKey key = signingKeyService.findSingleWithNamedQuery(SigningKey.FIND_ACTIVE, new HashMap<>());
+
+    if (key == null) {
+      log.debug("Unable to verify token, no signing key could be found");
+      return false;
+    }
+
+    SignedJWT jwt = null;
+    try {
+      jwt = SignedJWT.parse(token);
+    } catch (ParseException e) {
+      log.warn("Failed to parse token", e);
+      return false;
+    }
+
+    JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey) key.getPublicKey());
+
+    try {
+      if (!jwt.verify(verifier)) {
+        log.warn("Token Verification Failed, signature verification");
+        return false;
+      }
+    } catch (JOSEException e) {
+      log.warn("Exception Verifying Token", e);
+      return false;
+    }
+
+    JWSHeader jwtHeader = jwt.getHeader();
+
+    // Verify Algorithm
+    if (!JWSAlgorithm.RS256.equals(jwtHeader.getAlgorithm())) {
+      log.warn("Token Verification Failed, wrong algorithm used");
+      return false;
+    }
+
+    // Verify Claims
+    try {
+      if (!verifyJWTClaims(jwt.getJWTClaimsSet())) {
+        return false;
+      }
+    } catch (ParseException e) {
+      log.warn("Error reading claims", e);
+      return false;
+    }
+
+    // Blacklist
+    if (isJWTBlacklisted(jwt)) {
+      return false;
+    }
+
+    return true;
+
+  }
+
+  private boolean isJWTBlacklisted(SignedJWT jwt) {
+    return false;
+  }
+
+  private boolean verifyJWTClaims(JWTClaimsSet claims) {
+
+    // Issuer
+    if (!"budget-server".equals(claims.getIssuer())) {
+      log.warn("Token Verification Failed, invalid issuer");
+      return false;
+    }
+
+    // Expiration Time
+    Instant exipres = claims.getExpirationTime().toInstant();
+    if (new Date().toInstant().isAfter(exipres)) {
+      log.warn("Token Verification Failed, token is expired");
+      return false;
+    }
+
+    return true;
   }
 
 }

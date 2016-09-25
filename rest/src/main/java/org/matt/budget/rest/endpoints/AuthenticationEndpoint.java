@@ -1,4 +1,4 @@
-package org.matt.budget.rest.security;
+package org.matt.budget.rest.endpoints;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

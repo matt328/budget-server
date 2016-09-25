@@ -15,6 +15,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.matt.budget.models.Workspace;
+import org.matt.budget.rest.common.security.Secured;
 
 @Path("/workspaces")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,6 +28,7 @@ public interface WorkspaceResource {
 	@POST
 	public Response create(Workspace entity);
 
+	@Secured
 	@DELETE
 	@Path("/{workspaceId:[0-9][0-9]*}")
 	public Response deleteById(@PathParam("workspaceId") Integer workspaceId);

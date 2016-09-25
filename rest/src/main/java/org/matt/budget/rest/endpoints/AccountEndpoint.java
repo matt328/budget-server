@@ -1,4 +1,4 @@
-package org.matt.budget.rest;
+package org.matt.budget.rest.endpoints;
 
 import java.util.List;
 

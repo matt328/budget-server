@@ -10,7 +10,7 @@
     <class>org.matt.budget.models.Account</class>
     <class>org.matt.budget.models.Transaction</class>
     <class>org.matt.budget.models.User</class>
-    <class>org.matt.budget.models.Token</class>
+    <class>org.matt.budget.models.Role</class>
     <class>org.matt.budget.models.SigningKey</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
@@ -18,7 +18,7 @@
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
       <property name="hibernate.show_sql" value="true" />
-      <property name="javax.persistence.schema-generation.database.action" value="none" />
+      <property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
       <!-- <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create"/> -->
       <!-- <property name="javax.persistence.schema-generation.scripts.create-target" value="sampleCreate.ddl"/> -->
       <!-- <property name="javax.persistence.schema-generation.scripts.drop-target" value="sampleDrop.ddl"/> -->
