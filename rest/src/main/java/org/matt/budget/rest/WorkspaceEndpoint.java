@@ -61,10 +61,9 @@ public class WorkspaceEndpoint implements WorkspaceResource {
   public Response findById(@PathParam("workspaceId") Integer workspaceId, @Context Request request, @Context HttpHeaders headers) {
     Workspace entity;
 
-    try {
-      log.debug("finding by id: {}", workspaceId);
-      entity = workspaceService.findById(workspaceId);
-    } catch (Exception ex) {
+    log.debug("finding by id: {}", workspaceId);
+    entity = workspaceService.findById(workspaceId);
+    if (entity == null) {
       log.debug("Caught ObjectNotFoundException");
       return Response.status(Status.NOT_FOUND).build();
     }
