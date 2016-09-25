@@ -11,6 +11,7 @@
     <class>org.matt.budget.models.Transaction</class>
     <class>org.matt.budget.models.User</class>
     <class>org.matt.budget.models.Token</class>
+    <class>org.matt.budget.models.SigningKey</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 

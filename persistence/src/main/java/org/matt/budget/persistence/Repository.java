@@ -16,9 +16,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class Repository<T> implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -27,15 +24,15 @@ public class Repository<T> implements Serializable {
   protected EntityManager entityManager;
 
   protected Class<T> entityClass;
-  
+
   public T findSingleWithNamedQuery(String queryName, Map<String, Object> queryParameters) {
     TypedQuery<T> q = entityManager.createNamedQuery(queryName, getEntityClass());
-    for(Map.Entry<String, Object> param : queryParameters.entrySet()) {
+    for (Map.Entry<String, Object> param : queryParameters.entrySet()) {
       q.setParameter(param.getKey(), param.getValue());
     }
     return q.getSingleResult();
   }
-  
+
   public List<T> findAll() {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<T> cq = cb.createQuery(entityClass);

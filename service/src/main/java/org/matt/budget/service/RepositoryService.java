@@ -14,7 +14,6 @@ import javax.persistence.NoResultException;
 import org.matt.budget.persistence.BaseEntity;
 import org.matt.budget.persistence.Repository;
 import org.matt.budget.service.exception.InvalidDataException;
-import org.matt.budget.service.exception.ObjectNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +45,8 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
       return repo.find(id);
     } catch (NoResultException e) {
       String message = MessageFormat.format("Entity with id: {0} was not found", id);
-      throw new ObjectNotFoundException(message, e);
+      log.warn(message);
+      return null;
     }
   }
 
@@ -54,7 +54,7 @@ public abstract class RepositoryService<T extends BaseEntity> implements Seriali
     return repo.findAll();
   }
 
-  public T insert(T entity) {
+  public T insert(T entity) throws InvalidDataException {
     if (entity == null) {
       throw new InvalidDataException("Entity cannot be null");
     }

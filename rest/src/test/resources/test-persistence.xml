@@ -1,7 +1,7 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
-  version="2.1">
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
 
 	<persistence-unit name="budget-ds" transaction-type="JTA">
 		<jta-data-source>java:jboss/datasources/budget-ds</jta-data-source>
@@ -11,6 +11,7 @@
 		<class>org.matt.budget.models.Transaction</class>
 		<class>org.matt.budget.models.User</class>
 		<class>org.matt.budget.models.Token</class>
+		<class>org.matt.budget.models.SigningKey</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 
 		<properties>
@@ -18,11 +19,15 @@
 			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
 			<property name="hibernate.show_sql" value="true" />
 
-      <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
-<!--       <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create"/> -->
-<!--       <property name="javax.persistence.schema-generation.scripts.create-target" value="sampleCreate.ddl"/> -->
-<!--       <property name="javax.persistence.schema-generation.scripts.drop-target" value="sampleDrop.ddl"/> -->
-<!--       <property name="javax.persistence.sql-load-script-source" value="insert.sql"/> -->
+			<property name="javax.persistence.schema-generation.database.action"
+				value="drop-and-create" />
+			<!-- <property name="javax.persistence.schema-generation.scripts.action" 
+				value="drop-and-create"/> -->
+			<!-- <property name="javax.persistence.schema-generation.scripts.create-target" 
+				value="sampleCreate.ddl"/> -->
+			<!-- <property name="javax.persistence.schema-generation.scripts.drop-target" 
+				value="sampleDrop.ddl"/> -->
+			<!-- <property name="javax.persistence.sql-load-script-source" value="insert.sql"/> -->
 		</properties>
 
 	</persistence-unit>

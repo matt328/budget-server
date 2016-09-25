@@ -72,8 +72,7 @@ public class AuthenticationEndpointIT extends BaseRestIT {
            .expect()
            .statusCode(Status.OK.getStatusCode())
            .contentType(ContentType.JSON)
-           .body("token", Matchers.any(String.class))
-           .body("expire-date", Matchers.any(String.class))
+           .body(Matchers.any(String.class))
            .when()
            .post(basePath + "api/authz");
   }

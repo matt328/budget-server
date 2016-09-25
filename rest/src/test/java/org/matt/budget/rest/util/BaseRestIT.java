@@ -36,6 +36,7 @@ public abstract class BaseRestIT {
                                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                                .addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("com.jayway.restassured:rest-assured").withTransitivity().asFile())
                                .addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("org.mindrot:jbcrypt").withTransitivity().asFile())
+                               .addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("com.nimbusds:nimbus-jose-jwt").withTransitivity().asFile())
                                .addAsWebInfResource(new File(WEB_INF, "web.xml"), "web.xml")
                                .addAsWebInfResource(new File(WEB_INF, "beans.xml"), "beans.xml")
                                .addAsWebInfResource(new File(WEB_INF, "ejb-jar.xml"), "ejb-jar.xml");

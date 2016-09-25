@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: budget-service-dev
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  namespace: budget-service-dev
+  name: wildfly-replication-controller
+  labels:
+    name: wildfly
+    context: BudgetServer
+spec:
+  replicas: 1
+  selector:
+    name: wildfly
+    context: BudgetServer
+  template:
+    metadata:
+      labels:
+        name: wildfly
+        context: BudgetServer
+    spec:
+      containers:
+        - name: wildfly
+          image: jboss/wildfly:10.1.0.Final
+          ports:
+            - name: wildfly-port
+              containerPort: 8080
+              protocol: TCP
+            - name: admin-port
+              containerPort: 9990
+              protocol: TCP
+          command: [
+                    "sh",
+                    "-c",
+                    "/opt/jboss/wildfly/bin/standalone.sh -c standalone-ha.xml  -b `hostname --ip-address`"
+            ]
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: wildfly-service
+  namespace: budget-service-dev
+  labels:
+    name: wildfly-service
+    context: BudgetServer
+spec: 
+  type: NodePort
+  ports:
+    # the port that this service should serve on
+    - port: 8080
+      name: http
+      targetPort: 8080
+      nodePort: 30080
+    - port: 9990
+      name: management
+      targetPort: 9990
+      nodePort: 30990
+  # label keys and values that must match in order to receive traffic for this service
+  selector:
+    name: wildfly
+    context: BudgetServer

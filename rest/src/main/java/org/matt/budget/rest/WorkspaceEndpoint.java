@@ -20,7 +20,6 @@ import org.matt.budget.models.Workspace;
 import org.matt.budget.rest.common.AccountResource;
 import org.matt.budget.rest.common.WorkspaceResource;
 import org.matt.budget.service.WorkspaceService;
-import org.matt.budget.service.exception.ObjectNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
