@@ -6,8 +6,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -16,6 +18,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.matt.budget.models.User;
+import org.matt.budget.rest.common.security.AuthenticatedUser;
 import org.matt.budget.rest.common.security.Role;
 import org.matt.budget.rest.common.security.Secured;
 
@@ -23,6 +27,10 @@ import org.matt.budget.rest.common.security.Secured;
 @Provider
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
+
+  @Inject
+  @AuthenticatedUser
+  User user;
 
   @Context
   private ResourceInfo resourceInfo;
@@ -36,14 +44,14 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     Method resourceMethod = resourceInfo.getResourceMethod();
     List<Role> methodRoles = extractRoles(resourceMethod);
 
-    try {
-      if (methodRoles.isEmpty()) {
-        checkPermissions(classRoles);
-      } else {
-        checkPermissions(methodRoles);
+    if (methodRoles.isEmpty()) {
+      if (!checkPermissions(classRoles)) {
+        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
       }
-    } catch (Exception e) {
-      requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+    } else {
+      if (!checkPermissions(methodRoles)) {
+        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+      }
     }
   }
 
@@ -61,8 +69,15 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     }
   }
 
-  private void checkPermissions(List<Role> allowedRoles) throws Exception {
-    // Check if the user contains one of the allowed roles
-    // Throw an Exception if the user has not permission to execute the method
+  private boolean checkPermissions(List<Role> allowedRoles) {
+    List<String> allowed = allowedRoles.stream()
+                                       .map(Role::toString)
+                                       .collect(Collectors.toList());
+
+    List<String> currentRoles = user.getRoles().stream()
+                                    .map(org.matt.budget.models.Role::getName)
+                                    .collect(Collectors.toList());
+
+    return currentRoles.containsAll(allowed);
   }
 }
