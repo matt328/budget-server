@@ -1,9 +1,16 @@
 package org.matt.budget.rest.util;
 
+import static com.jayway.restassured.RestAssured.given;
+
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Response.Status;
+
+import org.hamcrest.Matchers;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -11,11 +18,17 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
 import org.matt.budget.models.Workspace;
+import org.matt.budget.rest.common.Credentials;
 
+import com.google.common.net.HttpHeaders;
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Header;
 import com.jayway.restassured.response.Response;
 
 public abstract class BaseRestIT {
+
+  @ArquillianResource
+  URL basePath;
 
   protected static final String WEB_INF = "src/main/webapp/WEB-INF";
 
@@ -55,4 +68,16 @@ public abstract class BaseRestIT {
     return r.header(headerName);
   }
 
+  protected Header getAuthHeader(String username, String password) {
+    Credentials credentials = new Credentials("matt", "megan");
+    Response response = given().contentType(ContentType.JSON)
+                               .body(credentials)
+                               .expect()
+                               .statusCode(Status.OK.getStatusCode())
+                               .contentType(ContentType.JSON)
+                               .body(Matchers.any(String.class))
+                               .when()
+                               .post(basePath + "api/authz");
+    return new Header(HttpHeaders.AUTHORIZATION, "Bearer " + response.print());
+  }
 }

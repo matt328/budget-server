@@ -62,8 +62,8 @@ public class CryptoTester {
 
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                                                        .subject("matt")
-                                                       .issuer("https://matt.com")
-                                                       .expirationTime(new Date(new Date().getTime() + 60 * 1000))
+                                                       .issuer("budget-server")
+                                                       .expirationTime(new Date(new Date().getTime() + 24 * 60 * 60 * 1000))
                                                        .build();
 
     SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet);

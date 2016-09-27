@@ -2,6 +2,7 @@ package org.matt.budget.models;
 
 import java.util.List;
 
+import javax.enterprise.inject.Vetoed;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,6 +36,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Vetoed
 @Cacheable
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)

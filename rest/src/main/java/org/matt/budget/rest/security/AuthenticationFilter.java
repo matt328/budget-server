@@ -17,6 +17,9 @@ import org.matt.budget.rest.common.security.AuthenticatedUser;
 import org.matt.budget.rest.common.security.Secured;
 import org.matt.budget.service.AuthService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Secured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -28,13 +31,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
   @Inject
   @AuthenticatedUser
   Event<String> userAuthenticatedEvent;
-  
+
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
 
     String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
     if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+      log.debug("No Auth Header present");
       throw new NotAuthorizedException("Authorization header must be provided");
     }
 
@@ -42,6 +46,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     if (!authService.isTokenValid(token)) {
       requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+    } else {
+      userAuthenticatedEvent.fire(authService.extractUser(token));
     }
   }
 }

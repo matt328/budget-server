@@ -106,12 +106,15 @@ public class WorkspaceEndpointIT extends BaseRestIT {
   }
 
   @Test
-  @UsingDataSet("workspaces.yml")
+  @UsingDataSet({ "workspaces.yml", "users.yml" })
   public void shouldFailUpdateWithWrongId() throws Exception {
+
     Workspace entity = Workspace.builder()
                                 .name("TestWorkspace")
                                 .build();
+
     Response response = given()
+                               .header(getAuthHeader("matt", "megan"))
                                .contentType(ContentType.JSON)
                                .body(entity)
                                .expect()
@@ -129,6 +132,14 @@ public class WorkspaceEndpointIT extends BaseRestIT {
            .when()
            .put(basePath + "api/workspaces/102");
   }
+
+  /*
+   * TODO: - Set a maximum JWT lifetime, if a token expires too far in the
+   * future, reject it. - Are there any other rules like this in the case a
+   * client tries to bring their own token? - Fix up the tests so that they
+   * request a token, and use that token for the tests
+   * 
+   */
 
   @Test
   @UsingDataSet("workspaces.yml")
@@ -154,6 +165,7 @@ public class WorkspaceEndpointIT extends BaseRestIT {
   }
 
   @Test
+  @UsingDataSet("users.yml")
   public void shouldCreateWorkspace() {
     Workspace entity = Workspace.builder()
                                 .name("TestWorkspace")
@@ -161,6 +173,7 @@ public class WorkspaceEndpointIT extends BaseRestIT {
 
     Response response = given()
                                .contentType(ContentType.JSON)
+                               .header(getAuthHeader("matt", "megan"))
                                .body(entity)
                                .expect()
                                .body("name", Matchers.equalTo("TestWorkspace"))

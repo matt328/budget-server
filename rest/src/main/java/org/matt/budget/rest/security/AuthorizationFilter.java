@@ -23,6 +23,9 @@ import org.matt.budget.rest.common.security.AuthenticatedUser;
 import org.matt.budget.rest.common.security.Role;
 import org.matt.budget.rest.common.security.Secured;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Secured
 @Provider
 @Priority(Priorities.AUTHORIZATION)
@@ -37,7 +40,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
-
+    System.out.println("Hello");
     Class<?> resourceClass = resourceInfo.getResourceClass();
     List<Role> classRoles = extractRoles(resourceClass);
 
@@ -46,10 +49,12 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     if (methodRoles.isEmpty()) {
       if (!checkPermissions(classRoles)) {
+        log.warn("User: {} tried to call {} but did not have sufficient roles", user.getUserId(), resourceClass.getName() + "." + resourceMethod.getName());
         requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
       }
     } else {
       if (!checkPermissions(methodRoles)) {
+        log.warn("User: {} tried to call {} but did not have sufficient roles", user.getUserId(), resourceClass.getName() + "." + resourceMethod.getName());
         requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
       }
     }

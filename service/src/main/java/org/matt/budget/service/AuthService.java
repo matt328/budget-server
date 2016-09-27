@@ -99,7 +99,9 @@ public class AuthService implements Serializable {
     }
 
     JWSSigner signer = new RSASSASigner(key.getPrivateKey());
-    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer("budget-server")
+
+    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject(userId)
+                                                       .issuer("budget-server")
                                                        .expirationTime(new Date(new Date().getTime() + 60 * 1000))
                                                        .build();
 
@@ -114,6 +116,31 @@ public class AuthService implements Serializable {
     }
 
     return signedJWT.serialize();
+  }
+
+  public String extractUser(String token) {
+    SigningKey key = signingKeyService.findSingleWithNamedQuery(SigningKey.FIND_ACTIVE, new HashMap<>());
+
+    if (key == null) {
+      log.debug("Unable to verify token, no signing key could be found");
+      return null;
+    }
+
+    SignedJWT jwt = null;
+    try {
+      jwt = SignedJWT.parse(token);
+    } catch (ParseException e) {
+      log.warn("Failed to parse token", e);
+      return null;
+    }
+
+    try {
+      return jwt.getJWTClaimsSet().getSubject();
+    } catch (ParseException e) {
+      log.warn("Failed to extract subject from claims");
+      return null;
+    }
+
   }
 
   public boolean isTokenValid(String token) {
@@ -169,7 +196,6 @@ public class AuthService implements Serializable {
     }
 
     return true;
-
   }
 
   private boolean isJWTBlacklisted(SignedJWT jwt) {

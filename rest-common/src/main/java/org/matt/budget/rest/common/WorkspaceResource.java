@@ -25,10 +25,11 @@ public interface WorkspaceResource {
 	@Path("/{workspaceId:[0-9][0-9]*}/accounts")
 	public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId);
 
+	
 	@POST
+	@Secured
 	public Response create(Workspace entity);
 
-	@Secured
 	@DELETE
 	@Path("/{workspaceId:[0-9][0-9]*}")
 	public Response deleteById(@PathParam("workspaceId") Integer workspaceId);
