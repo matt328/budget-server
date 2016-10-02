@@ -1,0 +1,13 @@
+# $WILDFLY_HOME/bin/jboss-cli.sh --file=/path/to/this/file.
+embed-server
+batch
+
+/subsystem=logging/console-handler=CONSOLE:change-log-level(level=TRACE)
+/subsystem=logging/root-logger=ROOT:write-attribute(name=level,value=INFO)
+
+/subsystem=logging/logger=org.matt:add
+/subsystem=logging/logger=org.matt:write-attribute(name="level", value="TRACE")
+
+/subsystem=logging/pattern-formatter=COLOR-PATTERN:write-attribute(name="pattern", value="%d{h:mm:ss} [%40.-40c{1.}] %-5p %s%E%n") 
+
+run-batch

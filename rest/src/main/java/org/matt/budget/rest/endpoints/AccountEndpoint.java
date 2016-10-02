@@ -59,7 +59,6 @@ public class AccountEndpoint implements AccountResource {
 
   @Override
   public Response deleteById(Integer id) {
-    // TODO Auto-generated method stub
     return null;
   }
 

@@ -31,13 +31,15 @@ public abstract class BaseRestIT {
   URL basePath;
 
   protected static final String WEB_INF = "src/main/webapp/WEB-INF";
+  protected static final String HOST = "127.0.0.1";
+  protected static final String PORT = "8080";
 
-  protected static final String ACCOUNTS_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";
-  protected static final String ACCOUNT_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts/${accountId}>; rel=\"self\"";
-  protected static final String ACCOUNTS_URI = "http://0.0.0.0:8080/test/api/workspaces/${workspaceId}/accounts/${accountId}";
+  protected static final String ACCOUNTS_LINK = "<http://" + HOST + ":" + PORT + "/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";
+  protected static final String ACCOUNT_SELF_LINK = "<http://" + HOST + ":" + PORT + "/test/api/workspaces/${workspaceId}/accounts/${accountId}>; rel=\"self\"";
+  protected static final String ACCOUNTS_URI = "http://" + HOST + ":" + PORT + "/test/api/workspaces/${workspaceId}/accounts/${accountId}";
 
-  protected static final String WORKSPACE_SELF_LINK = "<http://0.0.0.0:8080/test/api/workspaces/${workspaceId}>; rel=\"self\"";
-  protected static final String WORKSPACE_URI = "http://0.0.0.0:8080/test/api/workspaces/${workspaceId}";
+  protected static final String WORKSPACE_SELF_LINK = "<http://" + HOST + ":" + PORT + "/test/api/workspaces/${workspaceId}>; rel=\"self\"";
+  protected static final String WORKSPACE_URI = "http://" + HOST + ":" + PORT + "/test/api/workspaces/${workspaceId}";
 
   protected static Archive<?> buildWar() {
     MavenResolverSystem resolver = Maven.resolver();

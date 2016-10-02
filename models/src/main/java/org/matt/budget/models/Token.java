@@ -1,20 +1,15 @@
 package org.matt.budget.models;
 
-import java.util.Set;
-
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -41,19 +36,20 @@ import lombok.NoArgsConstructor;
 @Vetoed
 @Cacheable
 @XmlRootElement
-@EqualsAndHashCode(exclude = { "tokens" })
+@EqualsAndHashCode(exclude = { "user" })
 @XmlAccessorType(XmlAccessType.NONE)
-@Table(name = "users", indexes = { @Index(name = "idx_user_id", columnList = "userId", unique = true) })
-@NamedQuery(name = User.FIND_BY_USER_ID, query = User.FIND_BY_USER_ID_QUERY)
-public class User implements BaseEntity {
+@Table(name = "tokens", indexes = { @Index(name = "idx_token_id", columnList = "tokenId", unique = true) })
+@NamedQuery(name = Token.FIND_BY_TOKEN_ID, query = Token.FIND_BY_TOKEN_ID_QUERY)
+public class Token implements BaseEntity {
 
   public static final String COL_ID = "id";
-  public static final String COL_NAME = "name";
-  public static final String COL_USER_ID = "userId";
-  public static final String COL_PASSWORD_HASH = "passwordHash";
+  public static final String COL_TOKEN_ID = "tokenId";
+  public static final String COL_DEVICE = "device";
+  public static final String COL_REVOKED = "revoked";
+  public static final String COL_USER = "user_id";
 
-  public static final String FIND_BY_USER_ID = "findUserByUserId";
-  public static final String FIND_BY_USER_ID_QUERY = "SELECT u FROM User u WHERE u.userId = :" + COL_USER_ID;
+  public static final String FIND_BY_TOKEN_ID = "findByTokenId";
+  public static final String FIND_BY_TOKEN_ID_QUERY = "SELECT t FROM Token t WHERE t.tokenId = :" + COL_TOKEN_ID;
 
   @Id
   @Column(name = COL_ID)
@@ -61,26 +57,28 @@ public class User implements BaseEntity {
   @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQ", allocationSize = 1, initialValue = 100)
   private Integer id;
 
-  @Column(name = COL_NAME)
+  @Column(name = COL_TOKEN_ID)
   @XmlElement
-  private String name;
+  private String tokenId;
 
-  @Column(name = COL_USER_ID)
+  @Column(name = COL_DEVICE)
   @XmlElement
-  private String userId;
+  private String device;
 
-  @Column(name = COL_PASSWORD_HASH)
+  @Column(name = COL_REVOKED)
   @XmlElement
-  private String passwordHash;
-
-  @JsonIgnore
+  private Boolean revoked;
+  
   @XmlTransient
-  @OneToMany(fetch = FetchType.EAGER)
-  private Set<Token> tokens;
-
   @JsonIgnore
-  @XmlTransient
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-  private Set<Role> roles;
+  @ManyToOne
+  @JoinColumn(name = COL_USER)
+  private User user;
 }
+
+/*TODO Future Work:
+ * - When a user acquires a new token, store a record of that here, mapped by the jti
+ * - Also somehow capture a device string (fingerprintjs2)
+ * - when verifying tokens, verify that it exists in this list, has not been revoked, and matches
+ * the device they are accessing from.
+ */

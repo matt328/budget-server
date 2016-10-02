@@ -1,0 +1,9 @@
+# $WILDFLY_HOME/bin/jboss-cli.sh --file=/path/to/this/file.
+embed-server
+batch
+
+deploy /opt/jboss/postgresql-POSTGRESQL-JDBC-DRIVER-VERSION-bin.jar
+
+data-source add --name=PostgresDS --driver-name=postgresql-POSTGRESQL-JDBC-DRIVER-VERSION-bin.jar --jndi-name=java:/datasources/PostgresDS --connection-url=jdbc:postgresql://postgres:5432/postgres --user-name=${postgres.user} --password=${postgres.password}
+
+run-batch

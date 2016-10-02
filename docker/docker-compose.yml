@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+       - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=secret
+  wildfly:
+    build: ./wildfly-postgres
+    ports: 
+       - "18080:8080"
+       - "19990:9990"
+       - "18787:8787"
+       - "10022:22"
+    links: 
+      - postgres:postgres
+    command: -Dpostgres.user=postgres -Dpostgres.password=secret

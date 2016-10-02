@@ -53,7 +53,6 @@ public class WorkspaceEndpoint implements WorkspaceResource {
 
   @Override
   public Response deleteById(@PathParam("workspaceId") Integer workspaceId) {
-    // TODO Auto-generated method stub
     return null;
   }
 

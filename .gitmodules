@@ -1,3 +1,0 @@
-[submodule "vagrant/infrastructure"]
-	path = vagrant/infrastructure
-	url = ssh://git@git.psu.edu:5892/ais-swe/infrastructure.git

@@ -17,7 +17,11 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.persistence.Cleanup;
+import org.jboss.arquillian.persistence.CleanupStrategy;
 import org.jboss.arquillian.persistence.CleanupUsingScript;
+import org.jboss.arquillian.persistence.PersistenceTest;
+import org.jboss.arquillian.persistence.TestExecutionPhase;
 import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
@@ -32,6 +36,8 @@ import io.undertow.util.Headers;
 
 @RunWith(Arquillian.class)
 @CleanupUsingScript("cleanup.sql")
+@PersistenceTest
+@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
 public class WorkspaceEndpointIT extends BaseRestIT {
 
   @Deployment
@@ -133,14 +139,6 @@ public class WorkspaceEndpointIT extends BaseRestIT {
            .put(basePath + "api/workspaces/102");
   }
 
-  /*
-   * TODO: - Set a maximum JWT lifetime, if a token expires too far in the
-   * future, reject it. - Are there any other rules like this in the case a
-   * client tries to bring their own token? - Fix up the tests so that they
-   * request a token, and use that token for the tests
-   * 
-   */
-
   @Test
   @UsingDataSet("workspaces.yml")
   public void shouldCacheWithEtag() throws Exception {
@@ -168,7 +166,7 @@ public class WorkspaceEndpointIT extends BaseRestIT {
   @UsingDataSet("users.yml")
   public void shouldCreateWorkspace() {
     Workspace entity = Workspace.builder()
-                                .name("TestWorkspace")
+                                .name("TestWorkspaceCreated")
                                 .build();
 
     Response response = given()
@@ -176,7 +174,7 @@ public class WorkspaceEndpointIT extends BaseRestIT {
                                .header(getAuthHeader("matt", "megan"))
                                .body(entity)
                                .expect()
-                               .body("name", Matchers.equalTo("TestWorkspace"))
+                               .body("name", Matchers.equalTo("TestWorkspaceCreated"))
                                .when()
                                .post(basePath + "api/workspaces");
 
@@ -199,7 +197,7 @@ public class WorkspaceEndpointIT extends BaseRestIT {
   public void shouldUpdateWorkspace() {
     Workspace entity = Workspace.builder()
                                 .id(1)
-                                .name("TestWorkspace")
+                                .name("TestWorkspaceUpdated")
                                 .build();
 
     given()
@@ -215,7 +213,7 @@ public class WorkspaceEndpointIT extends BaseRestIT {
            .statusCode(Status.OK.getStatusCode())
            .header("Cache-Control", Matchers.is("no-transform, max-age=100"))
            .body("id", Matchers.is(1))
-           .body("name", Matchers.is("TestWorkspace"))
+           .body("name", Matchers.is("TestWorkspaceUpdated"))
            .when()
            .get(basePath + "api/workspaces/1");
   }

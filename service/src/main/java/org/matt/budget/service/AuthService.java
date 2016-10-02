@@ -8,15 +8,18 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import org.matt.budget.models.SigningKey;
+import org.matt.budget.models.Token;
 import org.matt.budget.models.User;
 import org.matt.budget.service.encryption.BCryptEncryption;
 import org.matt.budget.service.encryption.EncryptionService;
@@ -39,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService implements Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  private static final Duration JWT_MAX_AGE = Duration.ofDays(14);
 
   @Inject
   UserService userService;
@@ -91,7 +96,7 @@ public class AuthService implements Serializable {
     }
   }
 
-  public String issueToken(String userId) {
+  public String issueToken(String userId, String device) {
     SigningKey key = signingKeyService.findSingleWithNamedQuery(SigningKey.FIND_ACTIVE, new HashMap<>());
 
     if (key == null) {
@@ -100,7 +105,10 @@ public class AuthService implements Serializable {
 
     JWSSigner signer = new RSASSASigner(key.getPrivateKey());
 
+    String jti = UUID.randomUUID().toString().replaceAll("-", "");
+
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject(userId)
+                                                       .jwtID(jti)
                                                        .issuer("budget-server")
                                                        .expirationTime(new Date(new Date().getTime() + 60 * 1000))
                                                        .build();
@@ -114,6 +122,12 @@ public class AuthService implements Serializable {
       log.warn("Error signing JWT", e);
       return null;
     }
+
+    Token token = Token.builder().tokenId(jti)
+                       .device(device)
+                       .build();
+
+    userService.addTokenToUser(token, userId);
 
     return signedJWT.serialize();
   }
@@ -203,7 +217,7 @@ public class AuthService implements Serializable {
   }
 
   private boolean verifyJWTClaims(JWTClaimsSet claims) {
-
+    Instant now = Instant.now();
     // Issuer
     if (!"budget-server".equals(claims.getIssuer())) {
       log.warn("Token Verification Failed, invalid issuer");
@@ -215,6 +229,23 @@ public class AuthService implements Serializable {
     if (new Date().toInstant().isAfter(exipres)) {
       log.warn("Token Verification Failed, token is expired");
       return false;
+    }
+
+    // Max Age
+    Duration expiresIn = Duration.between(now, exipres);
+    if (expiresIn.getSeconds() > JWT_MAX_AGE.getSeconds()) {
+      log.warn("JWT expiration is too far in the future.  '" + expiresIn + "' is greater than system max: " + JWT_MAX_AGE);
+      return false;
+    }
+
+    if (claims.getIssueTime() != null) {
+      Instant issue = claims.getIssueTime().toInstant();
+
+      Duration issuedAt = Duration.between(issue, now);
+      if (issuedAt.getSeconds() > JWT_MAX_AGE.getSeconds()) {
+        log.warn("JWT was issued too far in the past.  '" + issuedAt + "' is greater than system max: " + JWT_MAX_AGE);
+        return false;
+      }
     }
 
     return true;

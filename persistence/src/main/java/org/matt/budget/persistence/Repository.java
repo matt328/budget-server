@@ -78,7 +78,7 @@ public class Repository<T> implements Serializable {
   }
 
   @Inject
-  public void Repository(final InjectionPoint ip) {
+  public Repository(final InjectionPoint ip) {
     if (ip != null && ip.getType() != null) {
       try {
         entityClass = resolveEntity(ip);

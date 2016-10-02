@@ -17,7 +17,7 @@ public class AuthenticationEndpoint implements AuthenticationResource {
   @Override
   public Response authenticateUser(Credentials credentials) {
     if (authService.authenticate(credentials.getUserId(), credentials.getPassword())) {
-      String token = authService.issueToken(credentials.getUserId());
+      String token = authService.issueToken(credentials.getUserId(), "testDevice");
       if (token != null) {
         return Response.ok(token).build();
       } else {
