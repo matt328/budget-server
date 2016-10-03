@@ -65,13 +65,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.arquillian</groupId>
-				<artifactId>arquillian-bom</artifactId>
-				<version>1.1.11.Final</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
 				<groupId>org.jboss.arquillian.extension</groupId>
 				<artifactId>arquillian-persistence-dbunit</artifactId>
 				<version>1.0.0.Alpha7</version>
@@ -89,8 +82,8 @@
 			</dependency>
 			<dependency>
 			  <groupId>org.wildfly.bom</groupId>
-			  <artifactId>jboss-javaee-7.0-wildfly-with-tools</artifactId>
-			  <version>10.0.0.CR2</version>
+			  <artifactId>wildfly-javaee7-with-tools</artifactId>
+			  <version>10.1.0.Final</version>
 			  <type>pom</type>
 			  <scope>import</scope>
 			</dependency>
