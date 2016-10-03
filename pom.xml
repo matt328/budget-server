@@ -39,7 +39,6 @@
 		<module>persistence</module>
 		<module>rest-common</module>
 		<module>service</module>
-		<module>testModule</module>
 	</modules>
 
 	<dependencyManagement>
@@ -66,39 +65,11 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.7.12</version>
-			</dependency>
-			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
 				<version>1.1.11.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.arquillian.junit</groupId>
-				<artifactId>arquillian-junit-container</artifactId>
-				<version>1.1.11.Final</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.arquillian.container</groupId>
-				<artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
-				<version>1.0.0.CR3</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.weld</groupId>
-				<artifactId>weld-core</artifactId>
-				<version>1.1.5.Final</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>1.1.7</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.extension</groupId>
@@ -107,31 +78,31 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.jayway.restassured</groupId>
-				<artifactId>rest-assured</artifactId>
-				<version>2.4.1</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.module</groupId>
-				<artifactId>jackson-module-jaxb-annotations</artifactId>
-				<version>2.5.4</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>nimbus-jose-jwt</artifactId>
 				<version>4.26.1</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>[2.4]</version>
+			  <groupId>com.jayway.restassured</groupId>
+			  <artifactId>rest-assured</artifactId>
+			  <version>2.9.0</version>
 			</dependency>
 			<dependency>
-			  <groupId>ch.qos.logback</groupId>
-			  <artifactId>logback-core</artifactId>
-			  <version>1.1.7</version>
+			  <groupId>org.wildfly.bom</groupId>
+			  <artifactId>jboss-javaee-7.0-wildfly-with-tools</artifactId>
+			  <version>10.0.0.CR2</version>
+			  <type>pom</type>
+			  <scope>import</scope>
+			</dependency>
+			<dependency>
+			  <groupId>org.slf4j</groupId>
+			  <artifactId>slf4j-api</artifactId>
+			  <version>1.7.21</version>
+			</dependency>
+			<dependency>
+			  <groupId>commons-io</groupId>
+			  <artifactId>commons-io</artifactId>
+			  <version>2.4</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -83,6 +84,7 @@ public class AccountEndpointIT extends BaseRestIT {
                                .expect()
                                .body("name", Matchers.equalTo("Test Account"))
                                .header(Headers.LOCATION_STRING, Matchers.equalTo(expectedLocationHeader))
+                               .time(Matchers.lessThan(1L), TimeUnit.SECONDS)
                                .when()
                                .post(basePath + "api/workspaces/" + workspaceId.toString() + "/accounts");
     List<String> linkValues = getLinkValues(response);

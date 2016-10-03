@@ -46,7 +46,7 @@ public class AuthService implements Serializable {
   private static final Duration JWT_MAX_AGE = Duration.ofDays(14);
 
   @Inject
-  UserService userService;
+  UsersService userService;
 
   @Inject
   SigningKeyService signingKeyService;

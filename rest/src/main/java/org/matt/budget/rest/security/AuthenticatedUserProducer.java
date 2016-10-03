@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import org.matt.budget.models.User;
 import org.matt.budget.rest.common.security.AuthenticatedUser;
-import org.matt.budget.service.UserService;
+import org.matt.budget.service.UsersService;
 
 @RequestScoped
 public class AuthenticatedUserProducer {
@@ -21,7 +21,7 @@ public class AuthenticatedUserProducer {
   private User authenticatedUser;
 
   @Inject
-  UserService userService;
+  UsersService userService;
 
   public void handleAuthenticationEvent(@Observes @AuthenticatedUser String username) {
     this.authenticatedUser = findUser(username);

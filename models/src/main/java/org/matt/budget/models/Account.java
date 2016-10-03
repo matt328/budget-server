@@ -26,8 +26,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.matt.budget.models.enums.AccountType;
 import org.matt.budget.persistence.BaseEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,47 +39,45 @@ import lombok.Data;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Account implements BaseEntity {
 
-	public Account() {
-		transactions = new ArrayList<>();
-	}
+  public Account() {
+    transactions = new ArrayList<>();
+  }
 
-	@Id
-	@GeneratedValue(generator = "account_seq")
-	@SequenceGenerator(name = "account_seq", sequenceName = "ACCOUNT_SEQ", allocationSize = 1, initialValue = 100)
-	@XmlElement
-	private Integer id;
+  @Id
+  @GeneratedValue(generator = "account_seq")
+  @SequenceGenerator(name = "account_seq", sequenceName = "ACCOUNT_SEQ", allocationSize = 1, initialValue = 100)
+  @XmlElement
+  private Integer id;
 
-	@NotNull
-	@Size(min = 1, max = 32)
-	@Column(name = "name")
-	@XmlElement
-	private String name;
+  @NotNull
+  @Size(min = 1, max = 32)
+  @Column(name = "name")
+  @XmlElement
+  private String name;
 
-	@Size(max = 255)
-	@Column(name = "note")
-	@XmlElement
-	private String note;
+  @Size(max = 255)
+  @Column(name = "note")
+  @XmlElement
+  private String note;
 
-	@Column(name = "reconcileBalance")
-	@XmlElement
-	private BigDecimal reconcileBalance;
+  @Column(name = "reconcileBalance")
+  @XmlElement
+  private BigDecimal reconcileBalance;
 
-	@Column(name = "reconcileDate")
-	@XmlElement
-	private LocalDateTime reconcileDate;
+  @Column(name = "reconcileDate")
+  @XmlElement
+  private LocalDateTime reconcileDate;
 
-	@Column(name = "accountType")
-	@XmlElement
-	private AccountType accountType;
+  @Column(name = "accountType")
+  @XmlElement
+  private AccountType accountType;
 
-	@XmlTransient
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "workspace_id")
-	private Workspace workspace;
+  @XmlTransient
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "workspace_id")
+  private Workspace workspace;
 
-	@XmlTransient
-	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
-	private List<Transaction> transactions;
+  @XmlTransient
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+  private List<Transaction> transactions;
 }

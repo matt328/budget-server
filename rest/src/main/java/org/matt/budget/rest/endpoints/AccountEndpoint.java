@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.matt.budget.models.Account;
+import org.matt.budget.rest.aop.Timed;
 import org.matt.budget.rest.common.AccountResource;
 import org.matt.budget.rest.common.WorkspaceResource;
 import org.matt.budget.service.AccountService;
@@ -47,6 +48,7 @@ public class AccountEndpoint implements AccountResource {
   WorkspaceService workspaceService;
 
   @Override
+  @Timed
   public Response create(Account entity) {
     Account created = workspaceService.addAccount(entity, workspaceId);
 
@@ -63,6 +65,7 @@ public class AccountEndpoint implements AccountResource {
   }
 
   @Override
+  @Timed
   public Response findById(@PathParam("id") Integer id) {
     Account account;
     try {
@@ -81,6 +84,7 @@ public class AccountEndpoint implements AccountResource {
   }
 
   @Override
+  @Timed
   public Response list() {
     log.debug("listing all accounts for Workspace {}", workspaceId);
     List<Account> accounts = accountService.list();
@@ -89,6 +93,7 @@ public class AccountEndpoint implements AccountResource {
   }
 
   @Override
+  @Timed
   public Response update(Integer id, Account entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST)

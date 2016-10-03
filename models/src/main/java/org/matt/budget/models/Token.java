@@ -20,8 +20,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.matt.budget.persistence.BaseEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -68,17 +66,16 @@ public class Token implements BaseEntity {
   @Column(name = COL_REVOKED)
   @XmlElement
   private Boolean revoked;
-  
+
   @XmlTransient
-  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = COL_USER)
   private User user;
 }
 
-/*TODO Future Work:
- * - When a user acquires a new token, store a record of that here, mapped by the jti
- * - Also somehow capture a device string (fingerprintjs2)
- * - when verifying tokens, verify that it exists in this list, has not been revoked, and matches
- * the device they are accessing from.
+/*
+ * TODO Future Work: - When a user acquires a new token, store a record of that
+ * here, mapped by the jti - Also somehow capture a device string
+ * (fingerprintjs2) - when verifying tokens, verify that it exists in this list,
+ * has not been revoked, and matches the device they are accessing from.
  */

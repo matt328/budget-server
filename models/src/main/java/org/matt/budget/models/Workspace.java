@@ -20,8 +20,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.matt.budget.persistence.BaseEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,7 +50,6 @@ public class Workspace implements BaseEntity {
   @XmlElement
   private String name;
 
-  @JsonIgnore
   @XmlTransient
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
   private List<Account> accounts;

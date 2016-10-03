@@ -25,8 +25,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.matt.budget.persistence.BaseEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -73,12 +71,10 @@ public class User implements BaseEntity {
   @XmlElement
   private String passwordHash;
 
-  @JsonIgnore
   @XmlTransient
   @OneToMany(fetch = FetchType.EAGER)
   private Set<Token> tokens;
 
-  @JsonIgnore
   @XmlTransient
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))

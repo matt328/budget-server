@@ -17,3 +17,5 @@ services:
     links: 
       - postgres:postgres
     command: -Dpostgres.user=postgres -Dpostgres.password=secret
+    environment:
+      - JAVA_OPTS= -Xmx2048m -Xms512m -XX:MaxPermSize=512m -Djava.net.preferIPv4Stack=true

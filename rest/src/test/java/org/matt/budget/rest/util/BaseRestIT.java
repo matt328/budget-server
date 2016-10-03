@@ -31,7 +31,7 @@ public abstract class BaseRestIT {
   URL basePath;
 
   protected static final String WEB_INF = "src/main/webapp/WEB-INF";
-  protected static final String HOST = "127.0.0.1";
+  protected static final String HOST = "0.0.0.0";
   protected static final String PORT = "8080";
 
   protected static final String ACCOUNTS_LINK = "<http://" + HOST + ":" + PORT + "/test/api/workspaces/${workspaceId}/accounts>; rel=\"accounts\"";

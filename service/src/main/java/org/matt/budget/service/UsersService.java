@@ -10,7 +10,7 @@ import org.matt.budget.models.Token;
 import org.matt.budget.models.User;
 
 @Stateless
-public class UserService extends RepositoryService<User> {
+public class UsersService extends RepositoryService<User> {
 
   private static final long serialVersionUID = 1L;
 

@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.matt.budget.models.Workspace;
+import org.matt.budget.rest.aop.Timed;
 import org.matt.budget.rest.common.AccountResource;
 import org.matt.budget.rest.common.WorkspaceResource;
 import org.matt.budget.service.WorkspaceService;
@@ -37,6 +38,7 @@ public class WorkspaceEndpoint implements WorkspaceResource {
   WorkspaceService workspaceService;
 
   @Override
+  @Timed
   public AccountResource listAccounts(@PathParam("workspaceId") Integer workspaceId) {
     return resourceContext.getResource(AccountEndpoint.class);
   }
@@ -52,11 +54,13 @@ public class WorkspaceEndpoint implements WorkspaceResource {
   }
 
   @Override
+  @Timed
   public Response deleteById(@PathParam("workspaceId") Integer workspaceId) {
     return null;
   }
 
   @Override
+  @Timed
   public Response findById(@PathParam("workspaceId") Integer workspaceId, @Context Request request, @Context HttpHeaders headers) {
     Workspace entity;
 
@@ -88,12 +92,14 @@ public class WorkspaceEndpoint implements WorkspaceResource {
   }
 
   @Override
+  @Timed
   public Response list() {
     List<Workspace> workspaces = workspaceService.list();
     return Response.ok(workspaces).build();
   }
 
   @Override
+  @Timed
   public Response update(@PathParam("workspaceId") Integer workspaceId, Workspace entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
