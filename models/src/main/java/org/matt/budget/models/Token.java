@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -34,6 +35,7 @@ import lombok.NoArgsConstructor;
 @Vetoed
 @Cacheable
 @XmlRootElement
+@ToString(exclude = { "user" })
 @EqualsAndHashCode(exclude = { "user" })
 @XmlAccessorType(XmlAccessType.NONE)
 @Table(name = "tokens", indexes = { @Index(name = "idx_token_id", columnList = "tokenId", unique = true) })
@@ -65,17 +67,10 @@ public class Token implements BaseEntity {
 
   @Column(name = COL_REVOKED)
   @XmlElement
-  private Boolean revoked;
+  private Boolean revoked = false;
 
   @XmlTransient
   @ManyToOne
   @JoinColumn(name = COL_USER)
   private User user;
 }
-
-/*
- * TODO Future Work: - When a user acquires a new token, store a record of that
- * here, mapped by the jti - Also somehow capture a device string
- * (fingerprintjs2) - when verifying tokens, verify that it exists in this list,
- * has not been revoked, and matches the device they are accessing from.
- */

@@ -44,12 +44,16 @@ public class AuthService implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private static final Duration JWT_MAX_AGE = Duration.ofDays(14);
+  public static final String DEVICE_CLAIM = "device";
 
   @Inject
   UsersService userService;
 
   @Inject
   SigningKeyService signingKeyService;
+
+  @Inject
+  TokenService tokenService;
 
   @Inject
   @BCryptEncryption
@@ -109,6 +113,7 @@ public class AuthService implements Serializable {
 
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject(userId)
                                                        .jwtID(jti)
+                                                       .claim(DEVICE_CLAIM, device)
                                                        .issuer("budget-server")
                                                        .expirationTime(new Date(new Date().getTime() + 60 * 1000))
                                                        .build();
@@ -124,6 +129,7 @@ public class AuthService implements Serializable {
     }
 
     Token token = Token.builder().tokenId(jti)
+                       .revoked(false)
                        .device(device)
                        .build();
 
@@ -217,6 +223,42 @@ public class AuthService implements Serializable {
   }
 
   private boolean verifyJWTClaims(JWTClaimsSet claims) {
+
+    // JTI
+    String device = (String) claims.getClaim(DEVICE_CLAIM);
+    if (device == null) {
+      log.warn("Token does not contain a device claim");
+      return false;
+    }
+
+    String jti = (String) claims.getJWTID();
+    if (jti == null) {
+      log.warn("Token does not contain a JTI");
+      return false;
+    }
+
+    Map<String, Object> queryParams = new HashMap<>();
+    queryParams.put(Token.COL_TOKEN_ID, jti);
+    Token token = tokenService.findSingleWithNamedQuery(Token.FIND_BY_TOKEN_ID, queryParams);
+
+    // Make sure a token exists
+    if (token == null) {
+      log.warn("Token does not exist");
+      return false;
+    }
+
+    // Check Revocation
+    if (token.getRevoked()) {
+      log.warn("Token has been revoked");
+      return false;
+    }
+
+    // Check device
+    if (!device.equals(token.getDevice())) {
+      log.warn("Token device does not match");
+      return false;
+    }
+
     Instant now = Instant.now();
     // Issuer
     if (!"budget-server".equals(claims.getIssuer())) {
