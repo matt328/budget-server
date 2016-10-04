@@ -1,102 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                              http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<groupId>org.matt.budget</groupId>
-	<artifactId>parent</artifactId>
-	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>Budget :: Parent Project</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.matt.budget</groupId>
+  <artifactId>parent</artifactId>
+  <packaging>pom</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Budget :: Parent Project</name>
 
-	<properties>
-		<version.jacoco>0.7.7.201606060606</version.jacoco>
-		<version.arquillian_jacoco>1.0.0.Alpha8</version.arquillian_jacoco>
-	</properties>
+  <properties>
+    <version.java>1.8</version.java>
+    <version.jacoco>0.7.7.201606060606</version.jacoco>
+    <version.arquillian_jacoco>1.0.0.Alpha8</version.arquillian_jacoco>
+    <version.lombok>1.16.10</version.lombok>
+    <version.junit>4.12</version.junit>
+    <version.arquillian-persistence-dbunit>1.0.0.Alpha7</version.arquillian-persistence-dbunit>
+    <version.surefire.plugin>2.17</version.surefire.plugin>
+    <version.jbcrypt>0.3m</version.jbcrypt>
+    <version.javaee>7.0</version.javaee>
+    <version.jose>4.26.1</version.jose>
+    <version.restAssured>2.9.0</version.restAssured>
+    <version.wildfly>10.1.0.Final</version.wildfly>
+    <version.slf4j>1.7.21</version.slf4j>
+    <version.commons.io>2.4</version.commons.io>
+  </properties>
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
-					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.17</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+  <modules>
+    <module>rest</module>
+    <module>models</module>
+    <module>persistence</module>
+    <module>rest-common</module>
+    <module>service</module>
+  </modules>
 
-	<modules>
-		<module>rest</module>
-		<module>models</module>
-		<module>persistence</module>
-		<module>rest-common</module>
-		<module>service</module>
-	</modules>
+  <build>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.mindrot</groupId>
-				<artifactId>jbcrypt</artifactId>
-				<version>0.3m</version>
-			</dependency>
-			<dependency>
-				<groupId>javax</groupId>
-				<artifactId>javaee-api</artifactId>
-				<version>7.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>1.16.6</version>
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.arquillian.extension</groupId>
-				<artifactId>arquillian-persistence-dbunit</artifactId>
-				<version>1.0.0.Alpha7</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>4.26.1</version>
-			</dependency>
-			<dependency>
-			  <groupId>com.jayway.restassured</groupId>
-			  <artifactId>rest-assured</artifactId>
-			  <version>2.9.0</version>
-			</dependency>
-			<dependency>
-			  <groupId>org.wildfly.bom</groupId>
-			  <artifactId>wildfly-javaee7-with-tools</artifactId>
-			  <version>10.1.0.Final</version>
-			  <type>pom</type>
-			  <scope>import</scope>
-			</dependency>
-			<dependency>
-			  <groupId>org.slf4j</groupId>
-			  <artifactId>slf4j-api</artifactId>
-			  <version>1.7.21</version>
-			</dependency>
-			<dependency>
-			  <groupId>commons-io</groupId>
-			  <artifactId>commons-io</artifactId>
-			  <version>2.4</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>${version.java}</source>
+            <target>${version.java}</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.surefire.plugin}</version>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.mindrot</groupId>
+        <artifactId>jbcrypt</artifactId>
+        <version>${version.jbcrypt}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax</groupId>
+        <artifactId>javaee-api</artifactId>
+        <version>${version.javaee}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${version.lombok}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.arquillian.extension</groupId>
+        <artifactId>arquillian-persistence-dbunit</artifactId>
+        <version>${version.arquillian-persistence-dbunit}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
+        <version>${version.jose}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.jayway.restassured</groupId>
+        <artifactId>rest-assured</artifactId>
+        <version>${version.restAssured}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7-with-tools</artifactId>
+        <version>${version.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${version.commons.io}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
